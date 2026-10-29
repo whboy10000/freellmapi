@@ -179,6 +179,19 @@ curl -fsSL https://freellmapi.co/install.sh | bash
 
 其余内容，包括 Docker Compose、本地开发、声明式启动配置、生产构建、局域网访问和备份，都在 **[docs/zh-cn/install/01-install.md](docs/zh-cn/install/01-install.md)**。
 
+## 本地源码运行（npm run dev）
+
+```bash
+nvm use 22          # 本项目要求 Node >=20.18 <25，推荐 .nvmrc 的 22
+npm install
+npm run dev         # 仪表盘 http://localhost:5173，API http://localhost:3001
+```
+
+- 用 **localhost** 访问，不要用 `127.0.0.1`（Vite 只监听 `::1`）。
+- 停止请按 **Ctrl+C**，不要按 Ctrl+Z：挂起的进程会继续占用 3001/5173，再次启动就报 `EADDRINUSE`，表现为“怎么都跑不起来”。
+- 端口被旧进程占用时：`lsof -ti tcp:3001 tcp:5173 | xargs kill -9` 后再启动。
+- 完整步骤（环境变量、生产构建、局域网访问）见 [DOCKER.zh-CN.md 第 4.3 节](DOCKER.zh-CN.md)，启动失败排查见 [第 9.4 节](DOCKER.zh-CN.md)。
+
 ## 桌面应用
 
 [`desktop/`](desktop) 里有一个原生的菜单栏应用：整个路由器加仪表盘就在你的托盘里本地运行，还有一个玻璃质感的悬浮窗显示实时请求统计。
@@ -216,6 +229,31 @@ npx freellmapi setup-claude --url http://localhost:3001 --api-key <统一密钥>
 
 FreeLLMAPI 在设计上是本地优先、单用户的。你的提供方密钥留在你自己的 SQLite 数据库里加密存放，请求从你的机器直接发往你启用的上游提供方。
 
+### 哪些智能体能用、哪些不能
+
+**能用**：任何会填 OpenAI 兼容 `base_url` 的客户端。网关同时提供三种协议——`/v1/chat/completions`（OpenAI Chat）、`/v1/responses`（OpenAI Responses）、`/v1/messages`（Anthropic Messages）：
+
+- **CLI 智能体**：Claude Code、Codex CLI、Aider、Qwen Code、Goose、Crush、DeepSeek Harness、MiMo、AtomCode 等；
+- **编辑器插件**：Cline、Roo Code、Kilo Code、Continue、Cursor（仅提供手动指引）；
+- **任意 OpenAI SDK 程序**：Python / JS / Go 里改 `base_url` 即可。
+
+所有客户端共用同一个 `freellmapi-…` 统一密钥，不需要为每个工具单独建 Key。
+
+**不是给厂商自家托管服务用的**：OpenAI 官方、Anthropic 官方、Google Gemini 这类是「上游提供方」，不是客户端，它们不会调用你的本地网关。
+
+三个限制：
+
+1. **模型能力门槛**：需要工具调用的 Agent（Cline、Claude Code）要求模型支持 tools；需要视觉的要求多模态；长上下文任务要求足够 context window。路由器会按能力过滤，但小模型接进去可能功能残缺。
+2. **协议转换有损耗**：Anthropic Messages / OpenAI Responses 都由网关归一化再转换，Claude Code 的 thinking、Codex 的部分原生特性可能不完全一致。
+3. **模型可见性取决于上游 Key**：没配 Key 的平台，其模型不会出现在 `/v1/models`，CLI 也选不到。
+
+> 从源码运行时 `npx freellmapi` 会提示 `command not found`（CLI 是 workspace 子包，未发布到 PATH）。改用：
+>
+> ```bash
+> npm run build -w cli
+> npm exec -w cli -- freellmapi setup-opencode --url http://localhost:3001 --api-key freellmapi-xxxx
+> ```
+
 ## 语言
 
 仪表盘提供 **60 种语言**（桌面托盘菜单为 6 种）。界面在首次加载时会自动检测你的浏览器或系统语言，之后随时可以在 **⋯ → 设置** 里切换，选择会被记住。从右往左书写的语言（العربية、עברית、فارسی、اردو）会自动翻转整个布局，并且只有当前语言的词典会被加载，其余的完全不占用你的带宽。
@@ -246,6 +284,8 @@ Premium 让这份签名目录在你运行的每一个路由器上保持实时。
 - 路由器本身永远保持 MIT 许可、完全免费。Premium 只是那条实时源，而正是它资助了每天的模型测试和目录维护，让这份目录始终可用。
 
 目录服务器不会看到你的提示词、补全结果或提供方密钥。无论是否订阅，路由器都完全自托管。
+
+> **本仓库构建默认关闭 Premium。** 未设置 `PREMIUM_ENABLED` 时，仪表盘不显示 Premium 入口和升级按钮，许可证激活会被拒绝，目录同步只使用免费的月度快照。需要实时目录时在 `.env` 设置 `PREMIUM_ENABLED=true`；不设置也不影响任何免费功能。
 
 ## 使用 API
 

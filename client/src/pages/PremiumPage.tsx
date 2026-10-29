@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ExternalLink, RefreshCw, Sparkles } from 'lucide-react'
 import { apiFetch } from '@/lib/api'
@@ -66,6 +67,12 @@ export default function PremiumPage() {
       window.open(url, '_blank', 'noopener')
     },
   })
+
+  // Free-only install: the page is unreachable from the nav, but keep the URL
+  // from rendering a paid upsell if someone bookmarks it.
+  if (data && !data.enabled) {
+    return <Navigate to="/models/chat" replace />
+  }
 
   if (isLoading || !data) {
     return (

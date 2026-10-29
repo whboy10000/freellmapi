@@ -4,6 +4,7 @@ import { apiFetch } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogPopup, DialogTitle } from '@/components/ui/dialog'
 import { useI18n } from '@/i18n'
+import { usePremium } from '@/hooks/use-premium'
 import { toast } from '@/lib/toast'
 import { formatContext, type FallbackEntry } from '@/lib/routing'
 import { scopeCandidates } from '@/lib/model-scope-selection'
@@ -20,6 +21,8 @@ export function EditModelsDialog({
   onOpenChange: (open: boolean) => void
 }) {
   const { t } = useI18n()
+  const { data: premium } = usePremium()
+  const premiumEnabled = premium?.enabled === true
   const queryClient = useQueryClient()
 
   const { data: catalog = [] } = useQuery<Pick<FallbackEntry, 'platform' | 'modelId' | 'displayName' | 'sizeLabel' | 'contextWindow'>[]>({
@@ -120,15 +123,17 @@ export function EditModelsDialog({
         ) : (
           <div className="flex items-start justify-between gap-4">
             <p className="max-w-prose text-xs text-muted-foreground">{t('keys.editModelsHint')}</p>
-            <Button
-              type="button"
-              variant="outline"
-              size="xs"
-              onClick={() => syncCatalog.mutate()}
-              disabled={syncCatalog.isPending}
-            >
-              {syncCatalog.isPending ? t('keys.editModelsSyncing') : t('keys.editModelsSync')}
-            </Button>
+            {premiumEnabled && (
+              <Button
+                type="button"
+                variant="outline"
+                size="xs"
+                onClick={() => syncCatalog.mutate()}
+                disabled={syncCatalog.isPending}
+              >
+                {syncCatalog.isPending ? t('keys.editModelsSyncing') : t('keys.editModelsSync')}
+              </Button>
+            )}
           </div>
         )}
 

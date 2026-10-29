@@ -348,10 +348,22 @@ describe('declarative config license', () => {
   }
 
   beforeEach(() => {
+    // Premium defaults to off; license tests exercise the opt-in path explicitly.
+    process.env.PREMIUM_ENABLED = 'true';
     getDb().prepare("DELETE FROM settings WHERE key IN ('premium_license_key', 'premium_license_status')").run();
   });
 
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    delete process.env.PREMIUM_ENABLED;
+    vi.restoreAllMocks();
+  });
+
+  it('ignores the configured license while Premium is disabled', () => {
+    delete process.env.PREMIUM_ENABLED;
+    const result = applyDeclarativeConfig({ license: 'flk_disabled_key' });
+    expect(result.license).toBe(false);
+    expect(getSetting(SETTING_LICENSE_KEY)).toBeUndefined();
+  });
 
   it('validates and stores a configured license key, then kicks a live sync', async () => {
     const fetchMock = mockLicenseService();

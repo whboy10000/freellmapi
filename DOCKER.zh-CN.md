@@ -173,15 +173,88 @@ HOST_BIND=0.0.0.0 docker compose up -d
 PORT=8080 docker compose up -d
 ```
 
-### 4.3 方式三：本地源码运行（非 Docker，对照参考）
+### 4.3 方式三：本地源码运行（npm run dev）
 
-容器内使用的是 Node 24，本机运行要求 Node `>=20.18 <25`（见 `.nvmrc` 的 22）：
+不装 Docker 时直接在宿主机跑。要求 Node `>=20.18 <25`，推荐用仓库 `.nvmrc` 指定的 **Node 22**。
+
+#### 第一步：切换到 Node 22
+
+```bash
+cd /path/to/freellmapi
+nvm use 22            # 没有 nvm：安装 Node 22 LTS 后再执行 npm install
+node -v               # 应为 v22.x
+```
+
+> 用 Node 26 等超出范围的版本，`better-sqlite3` 的原生模块可能与当前运行时 ABI 不匹配，启动时报
+> `compiled against a different Node.js version using NODE_MODULE_VERSION 127 ... requires 147`。
+> 处理方式：切回 Node 22 后执行 `npm rebuild better-sqlite3`（或删除 `node_modules` 重新 `npm install`）。
+
+#### 第二步：安装依赖
 
 ```bash
 npm install
-npm run dev          # 仪表盘 :5173，API :3001
-# 或生产构建
-npm run build && node server/dist/index.js
+```
+
+#### 第三步：准备加密密钥（可选但推荐）
+
+开发环境不设置也能启动：服务会在数据库旁自动生成 `.encryption-key`（权限 0600）。想让配置固定、可迁移，就写入 `.env`：
+
+```bash
+ENCRYPTION_KEY="$(openssl rand -hex 32)"
+printf "ENCRYPTION_KEY=%s\nPORT=3001\n" "$ENCRYPTION_KEY" > .env
+```
+
+已有 `.env` 时不要覆盖，确认里面有 `ENCRYPTION_KEY=...` 即可。优先级是：环境变量 `ENCRYPTION_KEY` > 数据库旁的 `.encryption-key` 文件。
+
+#### 第四步：启动
+
+```bash
+npm run dev
+```
+
+`npm run dev` 会用 `concurrently` 同时起两个进程：
+
+| 服务 | 地址 | 说明 |
+|---|---|---|
+| 仪表盘（Vite） | `http://localhost:5173` | 日常开发用这个，`/api` 和 `/v1` 会代理到 3001 |
+| API / 网关 | `http://localhost:3001` | OpenAI 兼容端点与 `/api/*` |
+
+启动成功的标志：
+
+```bash
+curl -s http://localhost:3001/api/ping
+# {"status":"ok","timestamp":"..."}
+```
+
+#### 停止与重启
+
+- 用 **Ctrl+C** 正常停止。**不要用 Ctrl+Z**：`^Z` 只是把进程挂起（`ps` 状态变成 `T`），端口仍被占用，再启动就会 `EADDRINUSE`，看起来像“运行不了”。
+- 端口被旧进程占用时，先清理再启动：
+
+```bash
+lsof -ti tcp:3001 tcp:5173 | xargs kill -9
+npm run dev
+```
+
+- 确认是否还有挂起的残留进程：
+
+```bash
+ps -o pid,stat,command | grep -E "tsx watch|vite" | grep -v grep
+# STAT 为 T 表示已暂停（Ctrl+Z），需要 kill 掉
+```
+
+#### 局域网访问仪表盘
+
+```bash
+npm run dev:lan      # Vite 绑定 0.0.0.0，同网段设备可访问
+```
+
+#### 生产构建（不用 Vite 开发服务器）
+
+```bash
+npm run build        # server + cli + client
+npm run start -w server
+# 然后访问 http://localhost:3001（API 与仪表盘同端口）
 ```
 
 ---
@@ -235,6 +308,7 @@ FREEAPI_CONFIG_JSON={"keys":[{"platform":"groq","key":"gsk_...","label":"main"}]
 | `FREEAPI_DB_BACKUP_KEY` | 否 | `ENCRYPTION_KEY` | 备份信封密钥 |
 | `FREEAPI_CONFIG_PATH` | 否 | 无 | 启动时幂等应用的 JSON 配置 |
 | `FREEAPI_CONFIG_JSON` | 否 | 无 | 内联 JSON 配置，优先于 PATH |
+| `PREMIUM_ENABLED` | 否 | `false` | 付费实时目录开关。默认关闭：仪表盘隐藏 Premium 入口与升级按钮，许可证激活返回 403，目录同步只用免费月度快照。设 `true` 恢复实时目录 |
 | `PROXY_URL` | 否 | 无 | 出站代理，如 `socks5h://host.docker.internal:7890` |
 | `TRUST_PROXY` | 否 | `false` | 反向代理后面时信任的地址/CIDR，或 `true` |
 | `ALLOWED_HOSTS` | 否 | 空 | 开启 DNS rebinding 防护的主机白名单 |
@@ -374,6 +448,22 @@ docker compose exec freellmapi node -e \
 ```
 
 另外确认没有开启 `FREEAPI_BLOCK_PRIVATE_PROVIDER_URLS=true`——它会把 `host.docker.internal` 这类私有地址一并拦掉（见 [变量说明](docs/zh-cn/env/01-variables.md)）。
+
+### 9.4 `npm run dev` 启动失败排查
+
+| 现象 | 原因 / 处理 |
+|---|---|
+| `Error: listen EADDRINUSE: address already in use :::3001` | 上一个 dev 进程没退干净。`lsof -ti tcp:3001 tcp:5173 \| xargs kill -9`，再 `npm run dev` |
+| 命令执行后一直“卡住”，没有报错，但浏览器打不开 | 进程曾被 **Ctrl+Z** 挂起，`ps` 状态为 `T`，端口仍占用。用 `fg` 恢复或 kill 掉后重启；以后用 Ctrl+C 停止 |
+| `NODE_MODULE_VERSION 127 ... requires 147` | Node 版本与 `better-sqlite3` 编译版本不一致。`nvm use 22 && npm rebuild better-sqlite3` |
+| 能打开 5173，但页面一直转圈 / 请求 `/api` 报 500 | 3001 的 server 没起来（多半是端口冲突或 `ENCRYPTION_KEY` 非法），看 dev 日志里 server 那一段 |
+| `http://127.0.0.1:5173` 拒绝连接，`localhost:5173` 正常 | Vite 绑定在 `::1`（IPv6）。请用 `localhost`，或用 `npm run dev:lan` 绑定 `0.0.0.0` |
+| 5173 被占用，Vite 自动换到 5174 | 正常行为，以终端打印的 `Local:` 地址为准；想固定端口先释放 5173 |
+| 修改 `.env` 后旧密钥无法解密 | 换了 `ENCRYPTION_KEY`。服务启动会打印警告并重建密钥文件；已加密的上游 Key 需要重新录入，或恢复旧密钥/备份 |
+| `npm install` 卡住或超时 | 检查网络/代理（`npm config get registry`），必要时配置 `PROXY_URL` 或换镜像源 |
+| `npx freellmapi setup-xxx` 报 `sh: freellmapi: command not found` | 源码仓库里的 CLI 是 workspace 子包，未构建/未链接到 PATH。先 `npm run build -w cli`，再 `npm exec -w cli -- freellmapi setup-opencode --url http://localhost:3001` |
+
+一句话排查顺序：**看 dev 输出的 server 段 → `curl localhost:3001/api/ping` → `lsof -ti tcp:3001 tcp:5173`**。
 
 更多问题见 [docs/zh-cn/troubleshooting/01-common-issues.md](docs/zh-cn/troubleshooting/01-common-issues.md)。
 

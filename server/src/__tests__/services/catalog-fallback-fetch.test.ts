@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { catalogFetch, setCatalogFallbackFetch, validateLicenseKey } from '../../services/catalog-sync.js';
 
 // Node's fetch failing the TLS handshake surfaces as TypeError('fetch failed')
@@ -17,6 +17,7 @@ function json(body: unknown, status = 200): Response {
 
 afterEach(() => {
   setCatalogFallbackFetch(null);
+  delete process.env.PREMIUM_ENABLED;
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -66,6 +67,19 @@ describe('catalogFetch', () => {
 });
 
 describe('validateLicenseKey', () => {
+  beforeEach(() => {
+    // License validation only runs on installs that opt into Premium.
+    process.env.PREMIUM_ENABLED = 'true';
+  });
+
+  it('returns null without calling the service while Premium is disabled', async () => {
+    delete process.env.PREMIUM_ENABLED;
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(validateLicenseKey('fla_TESTKEY')).resolves.toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('activates through the fallback when Node fetch cannot reach the service', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.stubGlobal('fetch', vi.fn(async () => { throw tlsFailure(); }));

@@ -54,6 +54,8 @@ docker compose logs -f freellmapi
 
 打开 http://localhost:3001 ，在「密钥」页添加提供方密钥，并从该页顶部拿到你的统一 API 密钥——你的 OpenAI SDK 要指向的就是它。
 
+本仓库构建默认 `PREMIUM_ENABLED=false`：仪表盘不显示 Premium 入口，许可证激活会被拒绝，目录同步停留在免费的月度快照。需要实时目录时在 `.env` 设置 `PREMIUM_ENABLED=true`。
+
 ## 端口与局域网访问
 
 Compose 文件把端口发布为 `"${HOST_BIND:-127.0.0.1}:${PORT:-3001}:3001"`。默认仪表盘/API 只能从运行 Docker 的那台机器访问；想从其他设备访问它（例如树莓派上的 `http://192.168.1.x:3001`）：

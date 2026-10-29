@@ -3,6 +3,7 @@ import { z } from 'zod';
 import type { Db } from '../db/types.js';
 import { getDb, getSetting, setSetting } from '../db/index.js';
 import { encrypt } from '../lib/crypto.js';
+import { isPremiumEnabled } from '../lib/config.js';
 import { resolveProvider } from '../providers/index.js';
 import { setCustomWeights, setRoutingStrategy, setKeySelectionStrategy } from './router.js';
 import { ensureModelInProfiles } from './profile-models.js';
@@ -530,8 +531,14 @@ export function applyDeclarativeConfig(input: unknown, source = 'inline'): Decla
   // service never delays boot; a failure logs a warning and leaves settings
   // untouched, the same contract as the dashboard's POST /api/premium/key.
   if (parsed.data.license) {
-    result.license = true;
-    void activateConfiguredLicense(parsed.data.license);
+    if (isPremiumEnabled()) {
+      result.license = true;
+      void activateConfiguredLicense(parsed.data.license);
+    } else {
+      const warning = 'license: ignored because Premium is disabled (PREMIUM_ENABLED=false)';
+      result.warnings.push(warning);
+      console.warn(`[config] ${warning}`);
+    }
   }
   return result;
 }
@@ -543,6 +550,10 @@ export function applyDeclarativeConfig(input: unknown, source = 'inline'): Decla
  * for tests.
  */
 export async function activateConfiguredLicense(key: string): Promise<void> {
+  if (!isPremiumEnabled()) {
+    console.warn('[config] license: ignored because Premium is disabled (PREMIUM_ENABLED=false)');
+    return;
+  }
   const trimmed = key.trim();
   try {
     if (getSetting(SETTING_LICENSE_KEY) === trimmed) return;

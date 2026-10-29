@@ -26,6 +26,7 @@ import { toast } from '@/lib/toast'
 import { apiBaseUrl } from '@/components/api-usage'
 import { COMMAND_PALETTE_EVENT } from '@/components/command-palette-state'
 import { useI18n } from '@/i18n'
+import { usePremium } from '@/hooks/use-premium'
 import type { FallbackEntry } from '@/lib/routing'
 import { useTheme } from '@/theme-context'
 
@@ -51,6 +52,8 @@ async function copyAndToast(value: string, success: string, failure: string) {
 // (arrows + Enter) with proper listbox semantics.
 export function CommandPalette() {
   const { t } = useI18n()
+  const { data: premium } = usePremium()
+  const premiumEnabled = premium?.enabled === true
   const { resolvedDark, setTheme } = useTheme()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
@@ -107,7 +110,7 @@ export function CommandPalette() {
 
   const commands = useMemo<Command[]>(() => {
     const go = (to: string) => () => navigate(to)
-    const pages: Command[] = [
+    const allPages: Command[] = [
       { id: 'p-chat', group: 'pages', label: t('models.chatModelsTab'), keywords: 'models chat routing fallback', icon: MessageSquare, run: go('/models/chat') },
       { id: 'p-image', group: 'pages', label: t('models.imageTab'), keywords: 'models image generation', icon: ImageIcon, run: go('/models/image') },
       { id: 'p-video', group: 'pages', label: t('models.videoTab'), keywords: 'models video text to video generation mp4', icon: Clapperboard, run: go('/models/video') },
@@ -122,6 +125,7 @@ export function CommandPalette() {
       { id: 'p-analytics', group: 'pages', label: t('nav.analytics'), keywords: 'analytics usage stats savings latency', icon: ChartColumn, run: go('/analytics') },
       { id: 'p-premium', group: 'pages', label: t('nav.premium'), keywords: 'premium catalog license subscription', icon: Sparkles, run: go('/premium') },
     ]
+    const pages = premiumEnabled ? allPages : allPages.filter(command => command.id !== 'p-premium')
     const actions: Command[] = [
       {
         id: 'a-theme',
@@ -174,7 +178,7 @@ export function CommandPalette() {
       })
     }
     return [...pages, ...actions, ...models]
-  }, [entries, keyData, navigate, resolvedDark, setTheme, t])
+  }, [entries, keyData, navigate, resolvedDark, setTheme, t, premiumEnabled])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()

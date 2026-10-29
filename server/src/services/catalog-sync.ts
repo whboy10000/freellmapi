@@ -17,6 +17,7 @@ import {
   reinstateUpstreamRetiredCatalogModel,
 } from './model-state.js';
 import { ensureAllModelsInProfiles } from './profile-models.js';
+import { isPremiumEnabled } from '../lib/config.js';
 
 // Generative-media modalities are routed into the separate media_models table
 // (see services/media.ts), never into the chat `models` table.
@@ -1057,7 +1058,9 @@ function applyCatalogInner(db: Db, catalog: Catalog): NonNullable<SyncResult['co
  */
 export async function syncCatalog(force = false): Promise<SyncResult> {
   const db = getDb();
-  const key = getSetting(SETTING_LICENSE_KEY);
+  // Free-only installs never present a license, so the service answers with the
+  // monthly snapshot even if a key is still stored in settings.
+  const key = isPremiumEnabled() ? getSetting(SETTING_LICENSE_KEY) : null;
   const applied = getSetting(SETTING_APPLIED_VERSION);
 
   try {
@@ -1147,6 +1150,7 @@ export interface LicenseActivation {
  * POST /api/premium/key and declarative `license` config.
  */
 export async function validateLicenseKey(key: string, timeoutMs = FETCH_TIMEOUT_MS): Promise<LicenseActivation | null> {
+  if (!isPremiumEnabled()) return null;
   try {
     const res = await catalogFetch(`${catalogBaseUrl()}/v1/license/activate`, {
       method: 'POST',
@@ -1163,6 +1167,7 @@ export async function validateLicenseKey(key: string, timeoutMs = FETCH_TIMEOUT_
 
 /** Revalidate the stored license against the catalog service and cache the result. */
 export async function refreshLicenseStatus(): Promise<LicenseStatus | null> {
+  if (!isPremiumEnabled()) return null;
   const key = getSetting(SETTING_LICENSE_KEY);
   if (!key) return null;
   try {
@@ -1184,6 +1189,7 @@ export async function refreshLicenseStatus(): Promise<LicenseStatus | null> {
 }
 
 export function getCachedLicenseStatus(): LicenseStatus | null {
+  if (!isPremiumEnabled()) return null;
   const raw = getSetting(SETTING_LICENSE_STATUS);
   if (!raw) return null;
   try {
@@ -1258,7 +1264,7 @@ export function startCatalogSync(scheduler: Scheduler): void {
   }
   reapplyCachedCatalog();
   const run = () => {
-    void refreshLicenseStatus();
+    if (isPremiumEnabled()) void refreshLicenseStatus();
     void syncCatalog();
   };
   cancelBootTimer = scheduler.after(BOOT_DELAY_MS, run);

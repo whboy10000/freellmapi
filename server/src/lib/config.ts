@@ -35,6 +35,21 @@ function parseRequestBodyLimitBytes(): number {
   return Math.floor(n) * 1024 * 1024;
 }
 
+/**
+ * Whether the paid Premium layer is available on this install.
+ *
+ * Default off: self-hosted builds serve the free catalog tier only. When off,
+ * the dashboard hides the Premium entry (the client reads `enabled` from
+ * GET /api/premium), license activation is rejected, and catalog sync never
+ * sends the stored license key, so it stays on the monthly snapshot.
+ * Set PREMIUM_ENABLED=true to restore the paid live-catalog behavior.
+ */
+export function isPremiumEnabled(): boolean {
+  const raw = process.env.PREMIUM_ENABLED;
+  if (raw === undefined || raw.trim() === '') return false;
+  return ['1', 'true', 'yes', 'on'].includes(raw.trim().toLowerCase());
+}
+
 export interface Config {
   port: number | string;
   host: string;

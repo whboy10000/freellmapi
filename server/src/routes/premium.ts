@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { getSetting, setSetting, getDb } from '../db/index.js';
+import { isPremiumEnabled } from '../lib/config.js';
 import {
   SETTING_LICENSE_KEY,
   SETTING_LICENSE_STATUS,
@@ -21,15 +22,24 @@ function maskKey(key: string): string {
 }
 
 function statusPayload() {
-  const key = getSetting(SETTING_LICENSE_KEY);
+  const enabled = isPremiumEnabled();
+  const key = enabled ? getSetting(SETTING_LICENSE_KEY) : null;
   return {
+    /** False on free-only installs; the dashboard uses this to hide the entry. */
+    enabled,
     hasKey: Boolean(key),
     maskedKey: key ? maskKey(key) : null,
-    license: getCachedLicenseStatus(),
+    license: enabled ? getCachedLicenseStatus() : null,
     catalog: getSyncState(),
     // Where "Go Premium" / "recover key" links point. Overridable for forks.
     siteUrl: (process.env.PREMIUM_SITE_URL ?? 'https://freellmapi.co').replace(/\/$/, ''),
   };
+}
+
+function rejectWhenDisabled(res: Response): boolean {
+  if (isPremiumEnabled()) return false;
+  res.status(403).json({ error: 'Premium is disabled on this install (PREMIUM_ENABLED=false).' });
+  return true;
 }
 
 /** GET /api/premium — everything the Premium page renders. */
@@ -44,6 +54,7 @@ premiumRouter.get('/', (_req: Request, res: Response) => {
  * visible within seconds, not at the next 12h poll.
  */
 premiumRouter.post('/key', async (req: Request, res: Response) => {
+  if (rejectWhenDisabled(res)) return;
   const key = typeof req.body?.key === 'string' ? req.body.key.trim() : '';
   if (key.length < 8) {
     res.status(400).json({ error: 'Enter the license key from your purchase email.' });
@@ -96,6 +107,7 @@ premiumRouter.post('/sync', async (_req: Request, res: Response) => {
  * entirely self-serve.
  */
 premiumRouter.post('/portal', async (_req: Request, res: Response) => {
+  if (rejectWhenDisabled(res)) return;
   const key = getSetting(SETTING_LICENSE_KEY);
   if (!key) {
     res.status(400).json({ error: 'No license key configured.' });

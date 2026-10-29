@@ -177,6 +177,19 @@ On Windows, the easiest path is the desktop **[`.exe` installer from Releases](h
 
 Everything else — Docker Compose, local development, declarative startup config, production builds, LAN access, and backups — is in **[docs/en/install/01-install.md](docs/en/install/01-install.md)**.
 
+## Run from source (`npm run dev`)
+
+```bash
+nvm use 22          # Node >=20.18 <25 is required; .nvmrc pins 22
+npm install
+npm run dev         # dashboard http://localhost:5173, API http://localhost:3001
+```
+
+- Open **localhost**, not `127.0.0.1` — Vite only listens on `::1`.
+- Stop with **Ctrl+C**, never Ctrl+Z: a suspended process keeps holding ports 3001/5173, so the next run fails with `EADDRINUSE`.
+- Ports still busy? `lsof -ti tcp:3001 tcp:5173 | xargs kill -9`, then start again.
+- Full steps (env vars, production build, LAN access) are in [DOCKER.zh-CN.md §4.3](DOCKER.zh-CN.md); startup troubleshooting is in [§9.4](DOCKER.zh-CN.md).
+
 ## Desktop app
 
 A native menu-bar app lives in [`desktop/`](./desktop): the entire router + dashboard running locally from your tray, with a glass popover showing live request stats.
@@ -201,6 +214,31 @@ MCP URL. **[ChatGPT setup →](docs/en/clients/01-agent-clients.md#chatgpt-priva
 Provider keys can be managed from the terminal too, with a dashboard session token (`FREELLMAPI_DASHBOARD_TOKEN` or `--token`): `npx freellmapi keys add|list|remove|test <platform>`, where `keys test` re-checks stored keys. See [cli/README.md](cli/README.md#provider-keys).
 
 FreeLLMAPI is local-first and single-user by design. Your provider keys stay in your SQLite database, encrypted at rest, and requests go from your machine to the upstream providers you enabled.
+
+### Which agents work, and which do not
+
+**Supported**: anything that accepts an OpenAI-compatible `base_url`. The gateway serves three protocols — `/v1/chat/completions` (OpenAI Chat), `/v1/responses` (OpenAI Responses) and `/v1/messages` (Anthropic Messages):
+
+- **CLI agents**: Claude Code, Codex CLI, Aider, Qwen Code, Goose, Crush, DeepSeek Harness, MiMo, AtomCode, and more;
+- **Editor extensions**: Cline, Roo Code, Kilo Code, Continue; Cursor gets manual instructions only;
+- **Any OpenAI SDK program**: point `base_url` at the gateway.
+
+Every client shares one unified `freellmapi-…` key; no per-tool keys.
+
+**Not supported**: vendor-hosted agents (OpenAI's own, Anthropic's own, Google Gemini) are upstream providers, not clients — they never call your local gateway.
+
+Three limits:
+
+1. **Model capabilities**: tool-driven agents (Cline, Claude Code) need `tools` support, vision features need multimodal models, and long tasks need enough context. The router filters by capability, but a small model may look connected yet behave poorly.
+2. **Protocol translation has edges**: Anthropic Messages and OpenAI Responses are normalized and re-emitted, so Claude Code thinking blocks or some native Codex features may differ.
+3. **Visibility depends on keys**: platforms without a configured provider key contribute no `/v1/models` entries, so the CLI cannot pick them.
+
+> Running from a source checkout, `npx freellmapi` reports `command not found` (the CLI is a workspace package that is not on PATH). Use:
+>
+> ```bash
+> npm run build -w cli
+> npm exec -w cli -- freellmapi setup-opencode --url http://localhost:3001 --api-key freellmapi-xxxx
+> ```
 
 ## Languages
 
@@ -261,6 +299,12 @@ live-feed routers receive the update the same day we ship it.
 
 The catalog server never sees your prompts, completions, or provider keys — the
 router stays fully self-hosted either way.
+
+> **This build ships with Premium off.** While `PREMIUM_ENABLED` is unset, the
+> dashboard hides the Premium page and upgrade buttons, license activation is
+> rejected, and catalog sync stays on the free monthly snapshot. Set
+> `PREMIUM_ENABLED=true` to opt back into the live feed. Every free feature works
+> without it.
 
 ## Using the API
 

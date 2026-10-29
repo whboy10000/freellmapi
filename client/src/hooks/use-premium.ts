@@ -20,6 +20,8 @@ export interface CatalogSyncState {
 }
 
 export interface PremiumStatus {
+  /** False on free-only installs (PREMIUM_ENABLED=false); hide every Premium entry. */
+  enabled: boolean
   hasKey: boolean
   maskedKey: string | null
   license: LicenseStatus | null

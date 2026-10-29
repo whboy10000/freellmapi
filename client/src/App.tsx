@@ -252,7 +252,9 @@ function Navbar() {
   }, [])
   const [credentialsMode, setCredentialsMode] = useState<'password' | 'email' | null>(null)
   const { data: premium, licensed, isLoading: premiumLoading, isError: premiumError } = usePremium()
-  const showUpgrade = Boolean(premium) && !licensed && !premiumLoading && !premiumError
+  const premiumEnabled = premium?.enabled === true
+  const showUpgrade = premiumEnabled && !licensed && !premiumLoading && !premiumError
+  const visibleNavItems = premiumEnabled ? navItems : navItems.filter(item => item.to !== '/premium')
 
   return (
     <>
@@ -274,7 +276,7 @@ function Navbar() {
             className="ms-10 hidden items-center gap-6 md:flex"
             style={isDesktopApp ? ({ WebkitAppRegion: 'no-drag' } as React.CSSProperties) : undefined}
           >
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const menu = navMenus[item.to]
               return menu ? (
                 // Split control: the label navigates, the chevron reveals the
@@ -352,7 +354,7 @@ function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuGroup>
-                  {navItems.map((item) => {
+                  {visibleNavItems.map((item) => {
                     const menu = navMenus[item.to]
                     return menu ? (
                       <DropdownMenuSub key={item.to}>
