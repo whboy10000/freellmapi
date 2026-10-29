@@ -2,72 +2,74 @@
 
 # FreeLLMAPI
 
-**7.4 billion tokens per month.  34 free LLM providers. 635 free model endpoints. One OpenAI-compatible endpoint.**
+**每月 74 亿词元。34 家免费 LLM 提供方。635 个免费模型端点。一个 OpenAI 兼容端点。**
 
-Aggregate free tiers from dozens of providers, plus custom OpenAI-compatible chat, embedding, image, and audio endpoints, behind a single `/v1` API. Keys are stored encrypted. A router picks the best available model for each request, falls over to the next provider when one is rate-limited, and tracks per-key usage so you stay under every free-tier cap.
+把几十家提供方的免费额度，连同任意自建的 OpenAI 兼容聊天、嵌入、图像和音频端点，一起聚合到单个 `/v1` API 之后。密钥加密存储。路由器为每个请求挑选当前可用的最佳模型，某家提供方触发限流时自动转移到下一家，并按密钥跟踪用量，让你始终待在各家的免费额度之内。
 
 [![CI](https://github.com/tashfeenahmed/freellmapi/actions/workflows/ci.yml/badge.svg)](https://github.com/tashfeenahmed/freellmapi/actions/workflows/ci.yml)
 [![GitHub stars](https://img.shields.io/github/stars/tashfeenahmed/freellmapi?style=flat&logo=github&color=yellow)](https://github.com/tashfeenahmed/freellmapi/stargazers)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#参与贡献)
 [![Docker image](https://img.shields.io/badge/ghcr.io-freellmapi-2496ED?logo=docker&logoColor=white)](https://github.com/tashfeenahmed/freellmapi/pkgs/container/freellmapi)
 [![Ask DeepWiki](https://img.shields.io/badge/DeepWiki-Ask-blue)](https://deepwiki.com/tashfeenahmed/freellmapi)
 
-**[freellmapi.co](https://freellmapi.co/?utm_source=github&utm_medium=readme&utm_campaign=repository&utm_content=readme_top)** · browse the full catalog: 474 model families, 635 free endpoints
+**[freellmapi.co](https://freellmapi.co/?utm_source=github&utm_medium=readme&utm_campaign=repository&utm_content=readme_top)** · 浏览完整目录：474 个模型系列，635 个免费端点
 
-**English** · [简体中文](README.zh-cn.md) · [Русский](README.ru.md)
+**简体中文**
 
 <p align="center">
-  <a href="https://github.com/tashfeenahmed/freellmapi/releases/latest"><img src="repo-assets/badges/macos.svg" height="48" alt="Download for macOS"></a>
-  <a href="https://github.com/tashfeenahmed/freellmapi/releases/latest"><img src="repo-assets/badges/windows.svg" height="48" alt="Download for Windows"></a>
-  <a href="docs/en/install/01-install.md#docker-compose"><img src="repo-assets/badges/docker.svg" height="48" alt="Self-host with Docker"></a>
-  <a href="https://play.google.com/store/apps/details?id=co.freellmapi.app"><img src="repo-assets/badges/play-store.svg" height="48" alt="Get it on Google Play"></a>
-  <a href="https://apps.apple.com/app/id6804648934"><img src="repo-assets/badges/app-store.svg" height="48" alt="Download on the App Store"></a>
+  <a href="https://github.com/tashfeenahmed/freellmapi/releases/latest"><img src="repo-assets/badges/macos.svg" height="48" alt="下载 macOS 版"></a>
+  <a href="https://github.com/tashfeenahmed/freellmapi/releases/latest"><img src="repo-assets/badges/windows.svg" height="48" alt="下载 Windows 版"></a>
+  <a href="docs/zh-cn/install/01-install.md#docker-compose"><img src="repo-assets/badges/docker.svg" height="48" alt="用 Docker 自托管"></a>
+  <a href="https://play.google.com/store/apps/details?id=co.freellmapi.app"><img src="repo-assets/badges/play-store.svg" height="48" alt="从 Google Play 获取"></a>
+  <a href="https://apps.apple.com/app/id6804648934"><img src="repo-assets/badges/app-store.svg" height="48" alt="从 App Store 下载"></a>
 </p>
 
-![FreeLLMAPI dashboard — Models page with the monthly token budget](repo-assets/github-hero.png)
+![FreeLLMAPI 仪表盘 —— 带每月词元额度的模型页](repo-assets/github-hero.png)
 
 
-Your router updates its own model catalog from a signed feed: new free models, quota changes, and compatibility fixes land without a `git pull`. Free installs get the monthly snapshot, so a model reaches them 30 days after it joins the live feed; premium routers get it the same day.
-**[Go live at freellmapi.co](https://freellmapi.co/?utm_source=github&utm_medium=readme&utm_campaign=premium&utm_content=readme_top#pricing)** ($19/yr, cancel anytime).
+你的路由器会从签名源自行更新模型目录：新的免费模型、额度变更和兼容性修复，都不需要 `git pull` 就能生效。免费版使用月度快照，模型通常在其加入实时源约 30 天后才能拿到；订阅版当天即可获取。
+**[前往 freellmapi.co 启用](https://freellmapi.co/?utm_source=github&utm_medium=readme&utm_campaign=premium&utm_content=readme_top#pricing)**（每年 $19，随时可取消）。
 
 </div>
 
 ---
 
-## Contents
+## 目录
 
-- [Why this exists](#why-this-exists)
-- [Supported providers](#supported-providers)
-- [Compatible CLIs & coding agents](#compatible-clis--coding-agents)
-- [How it compares](#how-it-compares)
-- [Features](#features)
-- [Quick start](#quick-start)
-- [Desktop app](#desktop-app)
-- [Works with OpenAI-compatible clients](#works-with-openai-compatible-clients)
-- [Languages](#languages)
-- [Premium (live catalog)](#premium-live-catalog)
-- [Using the API](#using-the-api)
-- [Screenshots](#screenshots)
-- [How it works](#how-it-works)
-- [FAQ](#faq)
-- [Limitations](#limitations)
-- [Contributing](#contributing)
-- [Disclaimer](#disclaimer)
+- [为什么会有这个项目](#为什么会有这个项目)
+- [支持的提供方](#支持的提供方)
+- [兼容的 CLI 与编程智能体](#兼容的-cli-与编程智能体)
+- [横向对比](#横向对比)
+- [功能](#功能)
+- [快速开始](#快速开始)
+- [桌面应用](#桌面应用)
+- [兼容 OpenAI 的客户端](#兼容-openai-的客户端)
+- [语言](#语言)
+- [Premium 实时目录](#premium-实时目录)
+- [使用 API](#使用-api)
+- [截图](#截图)
+- [工作原理](#工作原理)
+- [常见问题](#常见问题)
+- [局限性](#局限性)
+- [参与贡献](#参与贡献)
+- [免责声明](#免责声明)
 
-**Guides:** [Install & deploy](docs/en/install/01-install.md) · [API reference](docs/en/api/01-rest-api.md) · [Clients & coding agents](docs/en/clients/01-agent-clients.md) · [Prompt compression](docs/en/compression/01-compression-pipeline.md) · [Architecture & internals](docs/en/architecture/00-high-level-index.md) · [Documentation index](docs/en/README.md) · [Contributor guide](CONTRIBUTING.md)
+**指南：** [安装与部署](docs/zh-cn/install/01-install.md) · [API 参考](docs/zh-cn/api/01-rest-api.md) · [客户端与编程智能体](docs/zh-cn/clients/01-agent-clients.md) · [提示词压缩](docs/zh-cn/compression/01-compression-pipeline.md) · [架构与内部实现](docs/zh-cn/architecture/00-high-level-index.md) · [文档索引](docs/zh-cn/README.md) · [贡献者指南](CONTRIBUTING.md)
 
-## Why this exists
+> 所有指南都已有中文版，上面的链接指向中文页面；少数页面在英文原文更新后尚未同步，以英文版为准，每页页首都可切换到英文原文。完整的翻译状态见 [这里](docs/zh-cn/OVERVIEW.md#翻译状态)。
 
-Every serious AI lab now offers a free tier, a few million tokens a month, a few thousand requests a day. On its own each tier is a toy. Stacked together, they add up to roughly **7.4 billion tokens per month** of working inference capacity, across **474 model families / 635 provider endpoints** from small-and-fast to reasonably capable.
+## 为什么会有这个项目
 
-The problem is that stacking them by hand is painful: thirty-four different SDKs, thirty-four different rate limits, thirty-four places a request can fail. FreeLLMAPI collapses that into one OpenAI-compatible endpoint. Point any OpenAI client library at your local server, and it routes transparently across whichever providers you've added keys for.
+如今每家正经的 AI 实验室都提供免费额度：每月几百万词元，每天几千次请求。单独看，每一份都只是个玩具。叠加起来，它们合计约 **每月 74 亿词元** 的可用推理能力，覆盖 **474 个模型系列 / 635 个提供方端点**，从小而快的到相当能打的都有。
 
-And the free-tier landscape shifts weekly: providers launch models, retire them, and change quotas without notice. FreeLLMAPI tracks all of that for you. The router pulls a signed model catalog from [freellmapi.co](https://freellmapi.co) on its own, so your install keeps up without a `git pull`. See [Premium (live catalog)](#premium-live-catalog) for how fast it keeps up.
+问题在于手工叠加太痛苦：三十四套不同的 SDK，三十四种不同的限流规则，三十四个请求可能失败的地方。FreeLLMAPI 把这些收拢成一个 OpenAI 兼容端点。把任意 OpenAI 客户端库指向你的本地服务，它就会在你添加过密钥的提供方之间透明路由。
 
-![The free tier, stacked — ~7.4B tokens of free inference per month across 34 providers](repo-assets/free-tier.png)
+而且免费额度的格局每周都在变：提供方会上线新模型、下线旧模型，并且不打招呼就调整额度。这些 FreeLLMAPI 都替你盯着。路由器会自行从 [freellmapi.co](https://freellmapi.co) 拉取经过签名的模型目录，所以你的部署不用 `git pull` 也能跟上。跟进速度见 [Premium 实时目录](#premium-实时目录)。
 
-## Supported providers
+![叠加后的免费额度 —— 34 家提供方合计每月约 74 亿词元的免费推理](repo-assets/free-tier.png)
+
+## 支持的提供方
 
 <div align="center">
 <table>
@@ -84,24 +86,24 @@ And the free-tier landscape shifts weekly: providers launch models, retire them,
 <td align="center"><img src="repo-assets/providers/cohere.png" width="44" alt="Cohere"><br/><b>Cohere</b></td>
 </tr>
 <tr>
-<td align="center"><img src="repo-assets/providers/zhipu.png" width="44" alt="Z.ai (Zhipu)"><br/><b>Z.ai (Zhipu)</b></td>
+<td align="center"><img src="repo-assets/providers/zhipu.png" width="44" alt="Z.ai (Zhipu)"><br/><b>Z.ai（智谱）</b></td>
 <td align="center"><img src="repo-assets/providers/nvidia.png" width="44" alt="NVIDIA"><br/><b>NVIDIA</b></td>
 <td align="center"><img src="repo-assets/providers/huggingface.png" width="44" alt="HuggingFace"><br/><b>HuggingFace</b></td>
 </tr>
 <tr>
-<td align="center"><a href="https://modelscope.cn"><b>ModelScope</b><br/>Qwen3 · DeepSeek V4 · GLM-5 (needs Aliyun cn binding)</a></td>
+<td align="center"><a href="https://modelscope.cn"><b>ModelScope 魔搭</b><br/>Qwen3 · DeepSeek V4 · GLM-5（需要绑定阿里云中国站账号）</a></td>
 </tr>
 </table>
 
-<i>… and 22 more free providers</i>
+<i>…… 以及另外 22 家免费提供方</i>
 
 </div>
 
-Plus a **custom** provider — point chat, embedding, image, or audio models at any OpenAI-compatible endpoint (llama.cpp, LM Studio, vLLM, a local Ollama, or a remote gateway) from the Keys page.
+此外还有 **自定义** 提供方：在密钥页上，把聊天、嵌入、图像或音频模型指向任意 OpenAI 兼容端点（llama.cpp、LM Studio、vLLM、本地 Ollama，或者一个远程网关）。
 
-The full, always-current list lives at **[freellmapi.co/models](https://freellmapi.co/models.html)** with per-model rate limits, context windows, and free-token budgets.
+完整且始终最新的列表在 **[freellmapi.co/models](https://freellmapi.co/models.html)**，含每个模型的限流规则、上下文窗口和免费词元额度。
 
-## Compatible CLIs & coding agents
+## 兼容的 CLI 与编程智能体
 
 <div align="center">
 <table>
@@ -109,204 +111,194 @@ The full, always-current list lives at **[freellmapi.co/models](https://freellma
 <td align="center" width="150"><img src="repo-assets/agents/claude-code.png" width="44" alt="Claude Code"><br/><b>Claude Code</b></td>
 <td align="center" width="150"><img src="repo-assets/agents/codex.png" width="44" alt="Codex CLI"><br/><b>Codex CLI</b></td>
 <td align="center" width="150"><img src="repo-assets/agents/gemini-cli.png" width="44" alt="Gemini CLI"><br/><b>Gemini CLI</b></td>
-<td align="center" width="150"><img src="repo-assets/agents/cursor.png" width="44" alt="Cursor"><br/><b>Cursor</b></td>
+<td align="center" width="150"><img src="repo-assets/agents/aider.png" width="44" alt="Aider"><br/><b>Aider</b></td>
 </tr>
 <tr>
 <td align="center"><img src="repo-assets/agents/cline.png" width="44" alt="Cline"><br/><b>Cline</b></td>
 <td align="center"><img src="repo-assets/agents/roo-code.png" width="44" alt="Roo Code"><br/><b>Roo Code</b></td>
+<td align="center"><img src="repo-assets/agents/continue.png" width="44" alt="Continue"><br/><b>Continue</b></td>
 <td align="center"><img src="repo-assets/agents/opencode.png" width="44" alt="OpenCode"><br/><b>OpenCode</b></td>
-<td align="center"><img src="repo-assets/agents/aider.png" width="44" alt="Aider"><br/><b>Aider</b></td>
+</tr>
+<tr>
+<td align="center"><img src="repo-assets/agents/goose.png" width="44" alt="Goose"><br/><b>Goose</b></td>
+<td align="center"><img src="repo-assets/agents/qwen-code.png" width="44" alt="Qwen Code"><br/><b>Qwen Code</b></td>
+<td align="center"><img src="repo-assets/agents/kilo-code.png" width="44" alt="Kilo Code"><br/><b>Kilo Code</b></td>
+<td align="center"><img src="repo-assets/agents/crush.png" width="44" alt="Crush"><br/><b>Crush</b></td>
+</tr>
+<tr>
+<td align="center"><img src="repo-assets/agents/cursor.png" width="44" alt="Cursor"><br/><b>Cursor</b></td>
+<td align="center"><img src="repo-assets/agents/zed.png" width="44" alt="Zed"><br/><b>Zed</b></td>
+<td align="center"><img src="repo-assets/agents/jetbrains.png" width="44" alt="JetBrains AI"><br/><b>JetBrains AI</b></td>
 </tr>
 </table>
 
-<i>… plus Continue, Goose, Qwen Code, Kilo Code, Crush, Zed, JetBrains AI, DeepSeek Harness, MiMo Code, AtomCode, OpenClaw, Hermes Agent, Pi, Reasonix, ZCode and any OpenAI-compatible, Anthropic, Gemini or Ollama client</i>
+<i>…… 以及任何兼容 OpenAI 的客户端、Anthropic SDK、Gemini SDK，或支持 Ollama 的应用</i>
 
 </div>
 
-Most agents configure themselves with one command that reads your live catalog, backs up the existing config and merges into it:
+其中大多数一条命令就能配好：`npx freellmapi setup-claude`、`setup-codex`、`setup-aider`，还有另外十几个生成器。它们会拉取你当前的实时目录，备份已有配置，并且绝不覆盖你已经写好的内容。Claude Code 和 Codex 另有零留存启动器（`freellmapi launch`、`freellmapi launch-codex`），只把凭据注入子进程。Zed 和 JetBrains AI 通过可选的 [Ollama 模拟](docs/en/clients/01-agent-clients.md#ollama-clients) 接入；Gemini CLI 走它自己的 `/v1beta` 协议。
 
-```bash
-npx freellmapi setup-claude --url http://localhost:3001 --api-key <unified-key>
-```
+各工具的具体配方、setup CLI 参考、给无法发送请求头的客户端用的可撤销 URL 令牌，以及 MCP 服务，都在 **[客户端与编程智能体 →](docs/zh-cn/clients/01-agent-clients.md)**
 
-**[All supported agents and their setup commands →](docs/en/clients/02-supported-agents.md)** · [Per-tool recipes, MCP server and URL tokens →](docs/en/clients/01-agent-clients.md)
+## 横向对比
 
-## How it compares
+![与 OpenRouter、LiteLLM、Portkey 的功能对比](repo-assets/comparison.png)
 
-![Feature comparison against OpenRouter, LiteLLM, and Portkey](repo-assets/comparison.png)
+基于 2026 年 7 月的公开文档整理，欢迎指正。
 
-Based on public documentation, July 2026 — corrections welcome.
+## 功能
 
-## Features
+![功能概览](repo-assets/features.png)
 
-![Feature overview](repo-assets/features.png)
+- **OpenAI 的全部接口** —— `/v1/chat/completions`、`/v1/responses`（Codex CLI 需要它）、`/v1/completions`（编辑器的幽灵文本补全）、`/v1/images/generations`、`/v1/audio/speech`、`/v1/embeddings` 和 `/v1/models`，流式与非流式均可，来自官方 SDK 或任何 OpenAI 兼容客户端都行。[API 参考 →](docs/zh-cn/api/01-rest-api.md)
+- **Anthropic Messages API** —— `/v1/messages` 在同一套路由之上讲 Anthropic 的协议，所以 **Claude Code** 和官方 Anthropic SDK 可以直接跑在你的免费池上。[详情 →](docs/zh-cn/api/01-rest-api.md#anthropic-与-claude-客户端)
+- **原生 Gemini 与 Ollama 接口** —— Gemini CLI 可以用 `/v1beta`（`generateContent`、流式、词元计数、模型列表）；可选的 Ollama 模拟则为 Zed、JetBrains 以及其他本地模型客户端提供 NDJSON 的 chat/generate、标签、元数据和嵌入。
+- **Fusion（多模型合成）** —— 请求虚拟模型 `fusion`，路由器会把你的提示词并行分发给一组风格各异的免费模型，再由一个评审模型从这些草稿中合成出一个答案。[详情 →](docs/zh-cn/api/01-rest-api.md#fusion-多模型合成)
+- **图像生成与文本转语音** —— `/v1/images/generations` 和 `/v1/audio/speech` 会在提供媒体模型的提供方之间路由，也包括自定义的 OpenAI 兼容媒体端点。
+- **工具调用与结构化输出** —— OpenAI 风格的 `tools` 可在各提供方之间往返（纯文本形式的工具调用会被救回成真正的 `tool_calls`），另有 `response_format`、`seed`、`logprobs`、惩罚项以及其余采样参数按提供方透传。
+- **智能路由，六种策略** —— 实时的每模型速度、能力、稳定性评分决定你的链路顺序；遇到 429/5xx 时自动转移到下一个模型，并带冷却和密钥轮换。[路由详解 →](docs/zh-cn/architecture/00-high-level-index.md#工作原理)
+- **统一模型与配置档** —— 同一个模型在多家提供方上会合并成一个条目，并在组内严格故障转移；命名的回退链配置档（比如一条编程链、一条视觉链）可以在仪表盘里切换，也可以按请求用 `auto:<profile>` 指定。
+- **按密钥的限流跟踪** —— 以 `(平台, 模型, 密钥)` 为单位的 RPM/RPD/TPM/TPD 计数器，会学习提供方公布的上限，让路由始终不越线。
+- **自更新的模型目录** —— 路由器每天两次从 freellmapi.co 同步经过签名的目录：新模型、额度变更和提供方的怪癖修复都会自动生效。[Premium →](#premium-实时目录)
+- **粘性会话与上下文交接** —— 对话会在同一个模型上停留 30 分钟；如果中途确实换了模型，可选的精简交接说明能让话题保持连贯。[详情 →](docs/en/clients/01-agent-clients.md#context-handoff)
+- **提示词压缩（可选开启）** —— 一条共享且失败即放行的请求流程，可以在缓存查找和路由之前对提示词去重、过滤工具输出、压紧重复的 JSON，并裁掉过时的上下文。[详情 →](docs/zh-cn/compression/01-compression-pipeline.md)
+- **密钥加密存储，对外只有一个令牌** —— 提供方密钥以 AES-256-GCM 加密存放在 SQLite 中，每次请求时在内存里解密；你的应用自始至终只看到一个统一的 `freellmapi-…` bearer 令牌。
+- **管理仪表盘与分析** —— React 界面用来管理密钥、调整链路顺序、使用试验台，并查看 24 小时到 90 天窗口的 p50/p95/首个词元用时分析；带登录保护，支持明暗主题和 [60 种语言](#语言)。
+- **MCP 服务与交互式文档** —— 智能体可以通过 `/mcp` 查询可用模型、提供方健康状况和路由策略；`/v1/docs` 提供一个零依赖的 OpenAPI 浏览器。[编程智能体 →](docs/zh-cn/clients/01-agent-clients.md)
+- **运维上的便利** —— 可选的响应缓存、加密的数据库备份、定期密钥健康检查、密钥批量导入导出、声明式启动配置。[安装与部署 →](docs/zh-cn/install/01-install.md)
+- **能跑 Node 20+ 的地方都能跑** —— Windows、macOS、Linux 服务器，或者一块小小的 ARM 单板机（树莓派也行）。在 PM2 / systemd 或你惯用的守护进程下，空闲时常驻内存约 40 MB。
 
-- **Every OpenAI-style surface** — `/v1/chat/completions`, `/v1/responses` (what Codex CLI needs), `/v1/completions` (editor ghost-text autocomplete), `/v1/images/generations`, `/v1/videos/generations`, `/v1/audio/speech`, `/v1/audio/transcriptions`, `/v1/embeddings`, and `/v1/models` — streaming and non-streaming, from the official SDKs or any OpenAI-compatible client. [API reference →](docs/en/api/01-rest-api.md)
-- **Anthropic Messages API** — `/v1/messages` speaks Anthropic's wire format over the same router, so **Claude Code** and the official Anthropic SDKs run against your free pool. [Details →](docs/en/api/01-rest-api.md#anthropic--claude-clients)
-- **Native Gemini + Ollama surfaces** — Gemini CLI can use `/v1beta` (`generateContent`, streaming, token counting, models), while opt-in Ollama emulation serves NDJSON chat/generate, tags, metadata, and embeddings for Zed, JetBrains, and other local-model clients.
-- **Fusion (multi-model synthesis)** — request the virtual `fusion` model and the router fans your prompt out to a panel of diverse free models in parallel, then a judge model synthesizes one answer from the drafts. [Details →](docs/en/api/01-rest-api.md#fusion-multi-model-synthesis)
-- **Image, video & speech generation** — `/v1/images/generations`, `/v1/videos/generations`, and `/v1/audio/speech` route across the providers that serve media models; images and speech also accept custom OpenAI-compatible media endpoints. Video jobs are normalized across synchronous and queued providers and return a completed MP4.
-- **Tool calling & structured outputs** — OpenAI-style `tools` round-trip across providers (plain-text tool calls are rescued into real `tool_calls`), plus `response_format`, `seed`, `logprobs`, penalties, and the rest of the sampling params passed through per provider.
-- **Smart routing, six strategies** — live per-model speed/capability/reliability scores rank your chain; automatic fallover retries the next model on 429/5xx with cooldowns and key rotation. [Routing in detail →](docs/en/architecture/00-high-level-index.md#how-it-works)
-- **Unified models & profiles** — the same model on several providers collapses into one entry with strict in-group failover; named fallback-chain profiles (a coding chain, a vision chain) switch from the dashboard or per request via `auto:<profile>`, and custom chains can be renamed in place from the chain manager.
-- **Per-key rate tracking** — RPM/RPD/TPM/TPD counters per `(platform, model, key)` that learn providers' reported ceilings, so routing always stays under every cap.
-- **Self-updating model catalog** — the router syncs a signed catalog from freellmapi.co twice a day: new models, quota changes, and provider quirk fixes land automatically. Free installs track the monthly snapshot, which each model joins 30 days after it lands in the live feed; premium routers get it same-day. [Premium →](#premium-live-catalog)
-- **Sticky sessions & context handoff** — conversations stay on one model for 30 minutes; an optional compact handoff note keeps the thread coherent when a mid-chat switch does happen. [Details →](docs/en/clients/01-agent-clients.md#context-handoff)
-- **Prompt compression (opt-in)** — a shared, fail-open request pipeline can deduplicate prompts, filter tool output, compact repeated JSON, and trim stale context before cache lookup and routing. [Details →](docs/en/compression/01-compression-pipeline.md)
-- **Encrypted keys, one token out** — provider keys are AES-256-GCM encrypted in SQLite and decrypted in-memory per request; your apps only ever see a single unified `freellmapi-…` bearer token.
-- **Admin dashboard & analytics** — React UI to manage keys, reorder the chain, run a playground, and read p50/p95/TTFT analytics over 24h–90d windows; login-gated, dark/light themes, [60 languages](#languages).
-- **ChatGPT-ready MCP server & interactive docs** — ChatGPT and other MCP clients can call FreeLLMAPI inference, list usable models, inspect provider health/usage/cache/routing metadata, and manage the routing strategy over `/mcp`; a dependency-free OpenAPI viewer lives at `/v1/docs`. [ChatGPT and coding agents →](docs/en/clients/01-agent-clients.md#mcp-server)
-- **Ops niceties** — opt-in response cache, encrypted DB backups, periodic key health checks, bulk key import/export, declarative startup config. [Install & deploy →](docs/en/install/01-install.md)
-- **Runs anywhere Node 20+ runs** — Windows, macOS, Linux servers, or a small ARM SBC (Raspberry Pi included). ~40 MB RSS at idle behind PM2 / systemd / whatever supervisor you prefer.
+项目范围是刻意收窄的，参见 [尚不支持的部分](docs/zh-cn/architecture/00-high-level-index.md#尚不支持)。
 
-The scope is deliberately narrow — see [what's not supported yet](docs/en/architecture/00-high-level-index.md#not-yet-supported).
+## 快速开始
 
-## Quick start
-
-**One-liner** (Docker required — sets up `~/freellmapi`, generates an encryption key, pulls the image, and starts the container):
+**一行命令**（需要 Docker。它会建好 `~/freellmapi`、生成加密密钥、拉取镜像并启动容器）：
 
 ```bash
 curl -fsSL https://freellmapi.co/install.sh | bash
 ```
 
-Prefer to read before you pipe to bash? [The script is here](https://freellmapi.co/install.sh). Re-running it is safe: your `.env` (and encryption key) is preserved and the container updates to `:latest`.
+不放心直接管道给 bash？[脚本在这里](https://freellmapi.co/install.sh)。重复执行是安全的：你的 `.env`（以及加密密钥）会被保留，容器会更新到 `:latest`。
 
-Open http://localhost:3001, add your provider keys on the **Keys** page, reorder the **Fallback Chain** to taste, and grab your unified API key from the **Keys** page header. That unified key is what you point your OpenAI SDK at.
+打开 http://localhost:3001 ，在 **密钥** 页添加你的提供方密钥，按喜好调整 **回退链** 的顺序，然后在 **密钥** 页顶部拿到你的统一 API 密钥。这个统一密钥就是你的 OpenAI SDK 要指向的东西。
 
-On Windows, the easiest path is the desktop **[`.exe` installer from Releases](https://github.com/tashfeenahmed/freellmapi/releases/latest)** (below). On Android, see the experimental [Termux guide](docs/en/install/02-android-termux.md).
+在 Windows 上，最省事的方式是下面提到的桌面版 **[Releases 里的 `.exe` 安装包](https://github.com/tashfeenahmed/freellmapi/releases/latest)**。Android 上可参考实验性的 [Termux 指南](docs/zh-cn/install/02-android-termux.md)。
 
-Everything else — Docker Compose, local development, declarative startup config, production builds, LAN access, and backups — is in **[docs/en/install/01-install.md](docs/en/install/01-install.md)**.
+其余内容，包括 Docker Compose、本地开发、声明式启动配置、生产构建、局域网访问和备份，都在 **[docs/zh-cn/install/01-install.md](docs/zh-cn/install/01-install.md)**。
 
-## Run from source (`npm run dev`)
+## 本地源码运行（npm run dev）
 
 ```bash
-nvm use 22          # Node >=20.18 <25 is required; .nvmrc pins 22
+nvm use 22          # 本项目要求 Node >=20.18 <25，推荐 .nvmrc 的 22
 npm install
-npm run dev         # dashboard http://localhost:5173, API http://localhost:3001
+npm run dev         # 仪表盘 http://localhost:5173，API http://localhost:3001
 ```
 
-- Open **localhost**, not `127.0.0.1` — Vite only listens on `::1`.
-- Stop with **Ctrl+C**, never Ctrl+Z: a suspended process keeps holding ports 3001/5173, so the next run fails with `EADDRINUSE`.
-- Ports still busy? `lsof -ti tcp:3001 tcp:5173 | xargs kill -9`, then start again.
-- Full steps (env vars, production build, LAN access) are in [DOCKER.zh-CN.md §4.3](DOCKER.zh-CN.md); startup troubleshooting is in [§9.4](DOCKER.zh-CN.md).
+- 用 **localhost** 访问，不要用 `127.0.0.1`（Vite 只监听 `::1`）。
+- 停止请按 **Ctrl+C**，不要按 Ctrl+Z：挂起的进程会继续占用 3001/5173，再次启动就报 `EADDRINUSE`，表现为“怎么都跑不起来”。
+- 端口被旧进程占用时：`lsof -ti tcp:3001 tcp:5173 | xargs kill -9` 后再启动。
+- 完整步骤（环境变量、生产构建、局域网访问）见 [DOCKER.zh-CN.md 第 4.3 节](DOCKER.zh-CN.md)，启动失败排查见 [第 9.4 节](DOCKER.zh-CN.md)。
 
-## Desktop app
+## 桌面应用
 
-A native menu-bar app lives in [`desktop/`](./desktop): the entire router + dashboard running locally from your tray, with a glass popover showing live request stats.
+[`desktop/`](desktop) 里有一个原生的菜单栏应用：整个路由器加仪表盘就在你的托盘里本地运行，还有一个玻璃质感的悬浮窗显示实时请求统计。
 
-![FreeLLMAPI desktop app](repo-assets/desktop.png)
+![FreeLLMAPI 桌面应用](repo-assets/desktop.png)
 
-**[Download from Releases](https://github.com/tashfeenahmed/freellmapi/releases/latest)** — the macOS `.dmg` and the Windows `.exe` installer are attached to every release. No account or password to set up: the only credential you need is the unified API key from the tray popover. Build-from-source steps and where your data lives: [docs/en/install/01-install.md#desktop-app](docs/en/install/01-install.md#desktop-app).
+**[从 Releases 下载](https://github.com/tashfeenahmed/freellmapi/releases/latest)** —— 每个版本都附带 macOS 的 `.dmg` 和 Windows 的 `.exe` 安装包。不需要注册账号或设置密码：你唯一需要的凭据就是托盘悬浮窗里的统一 API 密钥。从源码构建的步骤，以及数据存放位置，见 [docs/zh-cn/install/01-install.md#桌面应用](docs/zh-cn/install/01-install.md#桌面应用)。
 
-For macOS 12 Monterey or later, choose **arm64 (Apple Silicon)** or **x64 (Intel)**. Both Mac builds also include a ZIP download.
+macOS 要求 12 Monterey 或更高版本；Apple Silicon 请选择 **arm64**，Intel 请选择 **x64**。两种 Mac 构建都提供 ZIP 下载。
 
-## Works with OpenAI-compatible clients
+## 兼容 OpenAI 的客户端
 
-Anything that can target an OpenAI-compatible base URL works: set it to `http://localhost:3001/v1` with the unified key from the dashboard. Every generator supports `--dry-run`; `npx freellmapi launch` (Claude Code) and `launch-codex` (Codex) keep credentials out of config files entirely. The router also doubles as an MCP server your agents can introspect mid-session.
+任何能指定 OpenAI 兼容 base URL 的东西都能用：把它设成 `http://localhost:3001/v1`，配上仪表盘里的统一密钥。**Claude Code**、**Codex CLI**、**Cline / Roo Code**、**Continue**（含行内补全）、**Aider**、**opencode** 和 **Cursor** 在 **[docs/zh-cn/clients/01-agent-clients.md](docs/zh-cn/clients/01-agent-clients.md)** 里各有一段简短配方。此外路由器本身还兼作 MCP 服务，你的智能体可以在会话中随时查询它。
 
-**ChatGPT** connects to the same local router through a private Secure MCP Tunnel. The
-`ask_freellmapi` MCP tool routes a ChatGPT-requested task through `/v1/chat/completions` and
-returns the answer with served-model, fallback, cache, execution, and token metadata. Base
-URL and bearer authentication live in the tunnel-client configuration; the default model is
-set with `MCP_INFERENCE_DEFAULT_MODEL` (`auto` when unset). No key belongs in Git or in the
-MCP URL. **[ChatGPT setup →](docs/en/clients/01-agent-clients.md#chatgpt-private-secure-mcp-tunnel)**
+最快的配置方式是根据你服务器上实际可用的模型生成：
 
-Provider keys can be managed from the terminal too, with a dashboard session token (`FREELLMAPI_DASHBOARD_TOKEN` or `--token`): `npx freellmapi keys add|list|remove|test <platform>`, where `keys test` re-checks stored keys. See [cli/README.md](cli/README.md#provider-keys).
+```bash
+npx freellmapi setup-claude --url http://localhost:3001 --api-key <统一密钥>
+```
 
-FreeLLMAPI is local-first and single-user by design. Your provider keys stay in your SQLite database, encrypted at rest, and requests go from your machine to the upstream providers you enabled.
+每个生成器都支持 `--dry-run`，改动已有文件前会先创建带时间戳的备份，并且是合并进用户配置而不是覆盖。启动器则把凭据完全挡在配置文件之外：Claude Code 用 `npx freellmapi launch`，Codex 用 `npx freellmapi launch-codex`。
 
-### Which agents work, and which do not
+| 智能体 | 自动配置命令 | Base URL |
+| --- | --- | --- |
+| Claude Code | `setup-claude` | 根路径 |
+| Codex CLI | `setup-codex` | `/v1` |
+| Cline | `setup-cline` | `/v1` |
+| Continue | `setup-continue` | `/v1` |
+| Aider | `setup-aider` | `/v1` |
+| OpenCode | `setup-opencode` | `/v1` |
+| Goose | `setup-goose` | `/v1` |
+| Qwen Code | `setup-qwen` | `/v1`（或原生 `/v1beta`） |
+| Roo / Kilo / Crush | `setup-roo` / `setup-kilo` / `setup-crush` | `/v1` |
+| Cursor | `setup-cursor` 指南 | 公网可达的 `/v1` URL |
 
-**Supported**: anything that accepts an OpenAI-compatible `base_url`. The gateway serves three protocols — `/v1/chat/completions` (OpenAI Chat), `/v1/responses` (OpenAI Responses) and `/v1/messages` (Anthropic Messages):
+**ChatGPT** 可以通过私有 Secure MCP Tunnel 连接同一个本地路由器。`ask_freellmapi` MCP 工具会把 ChatGPT 发起的任务经 `/v1/chat/completions` 路由，并返回答案及服务模型、回退、缓存、执行和词元元数据。Base URL 与 Bearer 认证放在 tunnel-client 配置里；默认模型用 `MCP_INFERENCE_DEFAULT_MODEL` 设置（未设置时为 `auto`）。密钥不要写进 Git，也不要放进 MCP URL。**[ChatGPT 配置 →](docs/zh-cn/clients/01-agent-clients.md)**
 
-- **CLI agents**: Claude Code, Codex CLI, Aider, Qwen Code, Goose, Crush, DeepSeek Harness, MiMo, AtomCode, and more;
-- **Editor extensions**: Cline, Roo Code, Kilo Code, Continue; Cursor gets manual instructions only;
-- **Any OpenAI SDK program**: point `base_url` at the gateway.
+也可以在终端里管理提供方密钥（需要仪表盘会话令牌 `FREELLMAPI_DASHBOARD_TOKEN` 或 `--token`）：`npx freellmapi keys add|list|remove|test <platform>`，其中 `keys test` 会重新检查已存密钥；从源码运行时改用 `npm exec -w cli -- freellmapi keys ...`。详见 [cli/README.md](cli/README.md#provider-keys)。
 
-Every client shares one unified `freellmapi-…` key; no per-tool keys.
+FreeLLMAPI 在设计上是本地优先、单用户的。你的提供方密钥留在你自己的 SQLite 数据库里加密存放，请求从你的机器直接发往你启用的上游提供方。
 
-**Not supported**: vendor-hosted agents (OpenAI's own, Anthropic's own, Google Gemini) are upstream providers, not clients — they never call your local gateway.
+### 哪些智能体能用、哪些不能
 
-Three limits:
+**能用**：任何会填 OpenAI 兼容 `base_url` 的客户端。网关同时提供三种协议——`/v1/chat/completions`（OpenAI Chat）、`/v1/responses`（OpenAI Responses）、`/v1/messages`（Anthropic Messages）：
 
-1. **Model capabilities**: tool-driven agents (Cline, Claude Code) need `tools` support, vision features need multimodal models, and long tasks need enough context. The router filters by capability, but a small model may look connected yet behave poorly.
-2. **Protocol translation has edges**: Anthropic Messages and OpenAI Responses are normalized and re-emitted, so Claude Code thinking blocks or some native Codex features may differ.
-3. **Visibility depends on keys**: platforms without a configured provider key contribute no `/v1/models` entries, so the CLI cannot pick them.
+- **CLI 智能体**：Claude Code、Codex CLI、Aider、Qwen Code、Goose、Crush、DeepSeek Harness、MiMo、AtomCode 等；
+- **编辑器插件**：Cline、Roo Code、Kilo Code、Continue、Cursor（仅提供手动指引）；
+- **任意 OpenAI SDK 程序**：Python / JS / Go 里改 `base_url` 即可。
 
-> Running from a source checkout, `npx freellmapi` reports `command not found` (the CLI is a workspace package that is not on PATH). Use:
+所有客户端共用同一个 `freellmapi-…` 统一密钥，不需要为每个工具单独建 Key。
+
+**不是给厂商自家托管服务用的**：OpenAI 官方、Anthropic 官方、Google Gemini 这类是「上游提供方」，不是客户端，它们不会调用你的本地网关。
+
+三个限制：
+
+1. **模型能力门槛**：需要工具调用的 Agent（Cline、Claude Code）要求模型支持 tools；需要视觉的要求多模态；长上下文任务要求足够 context window。路由器会按能力过滤，但小模型接进去可能功能残缺。
+2. **协议转换有损耗**：Anthropic Messages / OpenAI Responses 都由网关归一化再转换，Claude Code 的 thinking、Codex 的部分原生特性可能不完全一致。
+3. **模型可见性取决于上游 Key**：没配 Key 的平台，其模型不会出现在 `/v1/models`，CLI 也选不到。
+
+> 从源码运行时 `npx freellmapi` 会提示 `command not found`（CLI 是 workspace 子包，未发布到 PATH）。改用：
 >
 > ```bash
 > npm run build -w cli
 > npm exec -w cli -- freellmapi setup-opencode --url http://localhost:3001 --api-key freellmapi-xxxx
 > ```
 
-## Languages
+## 语言
 
-The dashboard ships in **60 languages** (the desktop tray menu in 6). The UI
-auto-detects your browser/system language on first load and you can switch any
-time from **⋯ → Settings**; the choice is remembered. Right-to-left languages
-(العربية, עברית, فارسی, اردو) flip the whole layout automatically, and only the
-active language's dictionary is loaded — the rest never touch your bandwidth.
+仪表盘提供 **60 种语言**（桌面托盘菜单为 6 种）。界面在首次加载时会自动检测你的浏览器或系统语言，之后随时可以在 **⋯ → 设置** 里切换，选择会被记住。从右往左书写的语言（العربية、עברית、فارسی、اردو）会自动翻转整个布局，并且只有当前语言的词典会被加载，其余的完全不占用你的带宽。
 
 <img src="https://flagcdn.com/24x18/us.png" srcset="https://flagcdn.com/48x36/us.png 2x" width="24" height="18" alt="United States" title="United States"> <img src="https://flagcdn.com/24x18/cn.png" srcset="https://flagcdn.com/48x36/cn.png 2x" width="24" height="18" alt="China" title="China"> <img src="https://flagcdn.com/24x18/es.png" srcset="https://flagcdn.com/48x36/es.png 2x" width="24" height="18" alt="Spain" title="Spain"> <img src="https://flagcdn.com/24x18/fr.png" srcset="https://flagcdn.com/48x36/fr.png 2x" width="24" height="18" alt="France" title="France"> <img src="https://flagcdn.com/24x18/br.png" srcset="https://flagcdn.com/48x36/br.png 2x" width="24" height="18" alt="Brazil" title="Brazil"> <img src="https://flagcdn.com/24x18/it.png" srcset="https://flagcdn.com/48x36/it.png 2x" width="24" height="18" alt="Italy" title="Italy"> <img src="https://flagcdn.com/24x18/in.png" srcset="https://flagcdn.com/48x36/in.png 2x" width="24" height="18" alt="India" title="India"> <img src="https://flagcdn.com/24x18/sa.png" srcset="https://flagcdn.com/48x36/sa.png 2x" width="24" height="18" alt="Saudi Arabia" title="Saudi Arabia"> <img src="https://flagcdn.com/24x18/bd.png" srcset="https://flagcdn.com/48x36/bd.png 2x" width="24" height="18" alt="Bangladesh" title="Bangladesh"> <img src="https://flagcdn.com/24x18/ru.png" srcset="https://flagcdn.com/48x36/ru.png 2x" width="24" height="18" alt="Russia" title="Russia"> <img src="https://flagcdn.com/24x18/pk.png" srcset="https://flagcdn.com/48x36/pk.png 2x" width="24" height="18" alt="Pakistan" title="Pakistan"> <img src="https://flagcdn.com/24x18/id.png" srcset="https://flagcdn.com/48x36/id.png 2x" width="24" height="18" alt="Indonesia" title="Indonesia"> <img src="https://flagcdn.com/24x18/de.png" srcset="https://flagcdn.com/48x36/de.png 2x" width="24" height="18" alt="Germany" title="Germany"> <img src="https://flagcdn.com/24x18/jp.png" srcset="https://flagcdn.com/48x36/jp.png 2x" width="24" height="18" alt="Japan" title="Japan"> <img src="https://flagcdn.com/24x18/ke.png" srcset="https://flagcdn.com/48x36/ke.png 2x" width="24" height="18" alt="Kenya" title="Kenya"> <img src="https://flagcdn.com/24x18/tr.png" srcset="https://flagcdn.com/48x36/tr.png 2x" width="24" height="18" alt="Türkiye" title="Türkiye"> <img src="https://flagcdn.com/24x18/vn.png" srcset="https://flagcdn.com/48x36/vn.png 2x" width="24" height="18" alt="Vietnam" title="Vietnam"> <img src="https://flagcdn.com/24x18/kr.png" srcset="https://flagcdn.com/48x36/kr.png 2x" width="24" height="18" alt="South Korea" title="South Korea"> <img src="https://flagcdn.com/24x18/ir.png" srcset="https://flagcdn.com/48x36/ir.png 2x" width="24" height="18" alt="Iran" title="Iran"> <img src="https://flagcdn.com/24x18/th.png" srcset="https://flagcdn.com/48x36/th.png 2x" width="24" height="18" alt="Thailand" title="Thailand"> <img src="https://flagcdn.com/24x18/pl.png" srcset="https://flagcdn.com/48x36/pl.png 2x" width="24" height="18" alt="Poland" title="Poland"> <img src="https://flagcdn.com/24x18/ua.png" srcset="https://flagcdn.com/48x36/ua.png 2x" width="24" height="18" alt="Ukraine" title="Ukraine"> <img src="https://flagcdn.com/24x18/mm.png" srcset="https://flagcdn.com/48x36/mm.png 2x" width="24" height="18" alt="Myanmar" title="Myanmar"> <img src="https://flagcdn.com/24x18/ro.png" srcset="https://flagcdn.com/48x36/ro.png 2x" width="24" height="18" alt="Romania" title="Romania"> <img src="https://flagcdn.com/24x18/nl.png" srcset="https://flagcdn.com/48x36/nl.png 2x" width="24" height="18" alt="Netherlands" title="Netherlands"> <img src="https://flagcdn.com/24x18/my.png" srcset="https://flagcdn.com/48x36/my.png 2x" width="24" height="18" alt="Malaysia" title="Malaysia"> <img src="https://flagcdn.com/24x18/ph.png" srcset="https://flagcdn.com/48x36/ph.png 2x" width="24" height="18" alt="Philippines" title="Philippines"> <img src="https://flagcdn.com/24x18/ng.png" srcset="https://flagcdn.com/48x36/ng.png 2x" width="24" height="18" alt="Nigeria" title="Nigeria"> <img src="https://flagcdn.com/24x18/et.png" srcset="https://flagcdn.com/48x36/et.png 2x" width="24" height="18" alt="Ethiopia" title="Ethiopia"> <img src="https://flagcdn.com/24x18/uz.png" srcset="https://flagcdn.com/48x36/uz.png 2x" width="24" height="18" alt="Uzbekistan" title="Uzbekistan"> <img src="https://flagcdn.com/24x18/az.png" srcset="https://flagcdn.com/48x36/az.png 2x" width="24" height="18" alt="Azerbaijan" title="Azerbaijan"> <img src="https://flagcdn.com/24x18/lk.png" srcset="https://flagcdn.com/48x36/lk.png 2x" width="24" height="18" alt="Sri Lanka" title="Sri Lanka"> <img src="https://flagcdn.com/24x18/np.png" srcset="https://flagcdn.com/48x36/np.png 2x" width="24" height="18" alt="Nepal" title="Nepal"> <img src="https://flagcdn.com/24x18/kh.png" srcset="https://flagcdn.com/48x36/kh.png 2x" width="24" height="18" alt="Cambodia" title="Cambodia"> <img src="https://flagcdn.com/24x18/gr.png" srcset="https://flagcdn.com/48x36/gr.png 2x" width="24" height="18" alt="Greece" title="Greece"> <img src="https://flagcdn.com/24x18/cz.png" srcset="https://flagcdn.com/48x36/cz.png 2x" width="24" height="18" alt="Czechia" title="Czechia"> <img src="https://flagcdn.com/24x18/hu.png" srcset="https://flagcdn.com/48x36/hu.png 2x" width="24" height="18" alt="Hungary" title="Hungary"> <img src="https://flagcdn.com/24x18/se.png" srcset="https://flagcdn.com/48x36/se.png 2x" width="24" height="18" alt="Sweden" title="Sweden"> <img src="https://flagcdn.com/24x18/il.png" srcset="https://flagcdn.com/48x36/il.png 2x" width="24" height="18" alt="Israel" title="Israel"> <img src="https://flagcdn.com/24x18/dk.png" srcset="https://flagcdn.com/48x36/dk.png 2x" width="24" height="18" alt="Denmark" title="Denmark"> <img src="https://flagcdn.com/24x18/fi.png" srcset="https://flagcdn.com/48x36/fi.png 2x" width="24" height="18" alt="Finland" title="Finland"> <img src="https://flagcdn.com/24x18/no.png" srcset="https://flagcdn.com/48x36/no.png 2x" width="24" height="18" alt="Norway" title="Norway"> <img src="https://flagcdn.com/24x18/sk.png" srcset="https://flagcdn.com/48x36/sk.png 2x" width="24" height="18" alt="Slovakia" title="Slovakia"> <img src="https://flagcdn.com/24x18/bg.png" srcset="https://flagcdn.com/48x36/bg.png 2x" width="24" height="18" alt="Bulgaria" title="Bulgaria"> <img src="https://flagcdn.com/24x18/hr.png" srcset="https://flagcdn.com/48x36/hr.png 2x" width="24" height="18" alt="Croatia" title="Croatia"> <img src="https://flagcdn.com/24x18/rs.png" srcset="https://flagcdn.com/48x36/rs.png 2x" width="24" height="18" alt="Serbia" title="Serbia"> <img src="https://flagcdn.com/24x18/lt.png" srcset="https://flagcdn.com/48x36/lt.png 2x" width="24" height="18" alt="Lithuania" title="Lithuania"> <img src="https://flagcdn.com/24x18/tw.png" srcset="https://flagcdn.com/48x36/tw.png 2x" width="24" height="18" alt="Taiwan" title="Taiwan"> <img src="https://flagcdn.com/24x18/pt.png" srcset="https://flagcdn.com/48x36/pt.png 2x" width="24" height="18" alt="Portugal" title="Portugal"> <img src="https://flagcdn.com/24x18/ge.png" srcset="https://flagcdn.com/48x36/ge.png 2x" width="24" height="18" alt="Georgia" title="Georgia">
 
-The full list of locales lives in
-[`client/src/i18n/locale-config.ts`](./client/src/i18n/locale-config.ts).
+完整的语言列表在 [`client/src/i18n/locale-config.ts`](client/src/i18n/locale-config.ts)。
 
-The original six locales are human-reviewed; the newer ones are machine-
-translated and improve as native speakers send corrections — a one-string PR is
-a great first contribution.
+最初的六种语言经过人工校对；较新的那些是机器翻译，并随着母语者提交修正而不断改进。改一个字符串的 PR 就是很好的第一次贡献。
 
-Translations live in [`client/src/i18n/locales/`](./client/src/i18n/locales) as
-flat JSON files. To fix a string, edit the value in the locale's JSON file. To
-add a language, copy `en.json`, translate the values, and register the locale in
-`client/src/i18n/locale-config.ts` (and `desktop/src/i18n.ts` for the tray
-strings); `npm test` checks every locale for key/placeholder parity — PRs
-welcome.
+翻译文件以扁平 JSON 的形式放在 [`client/src/i18n/locales/`](client/src/i18n/locales)。想修某个字符串，直接改对应语言 JSON 里的值即可。想加一门语言，复制 `en.json`、翻译其中的值，再到 `client/src/i18n/locale-config.ts` 注册这个语言（托盘文案还需要改 `desktop/src/i18n.ts`）；`npm test` 会检查每种语言的键和占位符是否对齐。欢迎提 PR。
 
-## Premium (live catalog)
+中文的术语约定见 [docs/TRANSLATION.md](docs/TRANSLATION.md)，提交翻译前请先过一遍，这样 README 和仪表盘里的说法能对得上。
 
-The router keeps its model catalog fresh on its own: it pulls a signed catalog
-from [freellmapi.co](https://freellmapi.co) twice a day and applies new models,
-quota changes, and provider quirk fixes to your local DB. Your own
-enable/disable choices and custom providers are never touched, and every
-download is verified against a pinned Ed25519 key before it is applied.
+## Premium 实时目录
 
-The catalog currently tracks **34 providers**, **474 model families**, **635
-free provider/model endpoints** (584 chat, 41 embeddings, 7 transcription, 3
-video), and roughly **7.4 billion tokens per month** of listed free-tier
-capacity. Browse the full set at
-**[freellmapi.co/models](https://freellmapi.co/models.html)**.
+路由器会自行保持模型目录的新鲜：它每天两次从 [freellmapi.co](https://freellmapi.co) 拉取经过签名的目录，把新模型、额度变更和提供方的怪癖修复应用到你的本地数据库。你自己的启用/停用选择和自定义提供方永远不会被动到，而且每次下载在应用之前都会用固定的 Ed25519 公钥验签。
 
-Free installs pull the same signed catalog, but from the monthly snapshot: a
-model joins it 30 days after it lands in the live feed, so the free build
-currently sits about 303 models behind. Nothing expires and nothing is
-crippled — it just arrives later.
+目录目前收录 **34 家提供方**、**474 个模型系列**、**635 个免费提供方/模型端点**（584 个聊天、41 个嵌入、7 个转录、3 个视频），以及大约 **每月 74 亿词元** 的免费额度容量。完整内容可在 **[freellmapi.co/models](https://freellmapi.co/models.html)** 浏览。
 
-Premium keeps that signed catalog live on every router you run. When a provider
-launches a strong free model, quietly tightens a quota, or breaks a wire format,
-live-feed routers receive the update the same day we ship it.
+Premium 让这份签名目录在你运行的每一个路由器上保持实时。当某家提供方上线了一个强力的免费模型、悄悄收紧了额度，或者改坏了协议格式，订阅了实时源的路由器会在我们发布的第一时间收到更新。
 
-**[Go live at freellmapi.co →](https://freellmapi.co/?utm_source=github&utm_medium=readme&utm_campaign=premium&utm_content=readme_bottom#pricing)**
+**[前往 freellmapi.co 启用 →](https://freellmapi.co/?utm_source=github&utm_medium=readme&utm_campaign=premium&utm_content=readme_bottom#pricing)**
 
-- $19/year or $49 once, lifetime. Stripe checkout; cancel anytime, self-serve.
-- One `fla_` key covers every router you run: desktop, homelab, Raspberry Pi.
-- Activate in the dashboard under **Premium**; cancel or manage billing
-  self-serve at [freellmapi.co/manage](https://freellmapi.co/manage).
-- The router itself stays MIT-licensed and fully free, forever. Premium is only
-  the live feed, and it's what funds the daily model testing and catalog
-  maintenance that keeps the catalog working.
+- 每年 $19，或一次性 $49 永久有效。Stripe 支付，随时可自助取消。
+- 一个 `fla_` 密钥覆盖你运行的所有路由器：桌面、家庭服务器、树莓派。
+- 在仪表盘的 **Premium** 页激活；取消或管理账单可自助前往 [freellmapi.co/manage](https://freellmapi.co/manage)。
+- 路由器本身永远保持 MIT 许可、完全免费。Premium 只是那条实时源，而正是它资助了每天的模型测试和目录维护，让这份目录始终可用。
 
-The catalog server never sees your prompts, completions, or provider keys — the
-router stays fully self-hosted either way.
+目录服务器不会看到你的提示词、补全结果或提供方密钥。无论是否订阅，路由器都完全自托管。
 
-> **This build ships with Premium off.** While `PREMIUM_ENABLED` is unset, the
-> dashboard hides the Premium page and upgrade buttons, license activation is
-> rejected, and catalog sync stays on the free monthly snapshot. Set
-> `PREMIUM_ENABLED=true` to opt back into the live feed. Every free feature works
-> without it.
+> **本仓库构建默认关闭 Premium。** 未设置 `PREMIUM_ENABLED` 时，仪表盘不显示 Premium 入口和升级按钮，许可证激活会被拒绝，目录同步只使用免费的月度快照。需要实时目录时在 `.env` 设置 `PREMIUM_ENABLED=true`；不设置也不影响任何免费功能。
 
-## Using the API
+## 使用 API
 
 ```python
 from openai import OpenAI
@@ -317,76 +309,76 @@ client = OpenAI(
 )
 
 resp = client.chat.completions.create(
-    model="auto",  # let the router pick; or "auto:fast", "auto:smart", a profile, or a model id
-    messages=[{"role": "user", "content": "Summarise the fall of Rome in one sentence."}],
+    model="auto",  # 交给路由器挑选；也可以用 "auto:fast"、"auto:smart"、某个配置档，或具体的模型 id
+    messages=[{"role": "user", "content": "用一句话概括罗马的衰亡。"}],
 )
 print(resp.choices[0].message.content)
 print("Routed via:", resp.headers.get("x-routed-via"))
 ```
 
-Streaming, the `auto:*` routing strategies, tool calling, vision input, Gemini Google Search grounding, embeddings, and the Anthropic Messages surface — with curl and Python examples for each — are all in **[docs/en/api/01-rest-api.md](docs/en/api/01-rest-api.md)**. Every response carries an `X-Routed-Via: <platform>/<model>` header so you can see which provider actually served it.
+流式、`auto:*` 路由策略、工具调用、视觉输入、Gemini 的 Google 搜索接地、嵌入，以及 Anthropic Messages 接口，连同各自的 curl 和 Python 示例，全都在 **[docs/zh-cn/api/01-rest-api.md](docs/zh-cn/api/01-rest-api.md)**。每个响应都带一个 `X-Routed-Via: <平台>/<模型>` 头，你可以据此看出实际是哪家提供方处理的。
 
-## Screenshots
+## 截图
 
-### Models
+### 模型
 
-Pick a routing strategy and watch the monthly token budget fill across the whole provider fleet. Every model shows live reliability, speed, and intelligence scores — the order below is how requests route right now.
+选一种路由策略，看着每月词元额度在整个提供方队列上被填满。每个模型都显示实时的稳定性、速度和智能评分，下面的顺序就是当前请求的路由顺序。
 
-![Models page](repo-assets/models.png)
+![模型页](repo-assets/models.png)
 
-### Keys
+### 密钥
 
-Manage provider credentials and grab the unified API key your apps connect with. Each key shows a status dot and when it was last health-checked.
+管理提供方凭据，并拿到你的应用要用的统一 API 密钥。每个密钥都有一个状态点，以及最近一次健康检查的时间。
 
-![Keys page](repo-assets/keys.png)
+![密钥页](repo-assets/keys.png)
 
-### Playground
+### 试验台
 
-Send a chat completion through the router and see which provider served it, with the model ID and latency printed right on the message. Attach files by button, drag-and-drop, or paste: images (PNG/JPEG/WebP/GIF) are downscaled in the browser and sent as image content parts to a vision-capable model, and text files (TXT/MD/CSV/JSON/LOG) are inlined into the prompt as fenced blocks.
+通过路由器发一条聊天补全请求，看看是哪家提供方处理的，模型 ID 和延迟就印在消息上。可以用按钮、拖放或粘贴来添加附件：图片（PNG/JPEG/WebP/GIF）会在浏览器里先缩小，再作为图像内容块发给具备视觉能力的模型；文本文件（TXT/MD/CSV/JSON/LOG）则以代码块的形式内联进提示词。
 
-![Playground page](repo-assets/playground.png)
+![试验台页](repo-assets/playground.png)
 
-### Analytics
+### 分析
 
-Request volume, success rate, tokens in and out, average latency, and per-provider breakdowns over 24h / 7d / 30d / 90d windows.
+请求量、成功率、输入与输出词元、平均延迟，以及按提供方的细分，覆盖 24 小时 / 7 天 / 30 天 / 90 天窗口。
 
-![Analytics page](repo-assets/analytics.png)
+![分析页](repo-assets/analytics.png)
 
-## How it works
+## 工作原理
 
-![One request in, the best free model out — the fallback chain with live scores, cooldowns, and quota tracking](repo-assets/router-flow.png)
+![一个请求进去，最合适的免费模型出来 —— 带实时评分、冷却和额度跟踪的回退链](repo-assets/router-flow.png)
 
-One request in, the best free model out: the router picks the highest-priority model with a healthy key that's under all its rate limits, decrypts the key in memory, and calls the provider — on a 429/5xx it cools that key down and retries the next model in your chain. The component walkthrough, routing internals, and operational details live in **[docs/en/architecture/00-high-level-index.md](docs/en/architecture/00-high-level-index.md)**.
+一个请求进去，最合适的免费模型出来：路由器挑出优先级最高、密钥健康且未超出任何限流的模型，在内存中解密密钥并调用提供方；遇到 429/5xx 就让那个密钥进入冷却，然后重试你链路上的下一个模型。组件走查、路由内部实现和运维细节都在 **[docs/zh-cn/architecture/00-high-level-index.md](docs/zh-cn/architecture/00-high-level-index.md)**。
 
-## FAQ
+## 常见问题
 
-**Do I need a password?** Not for the desktop app — the dashboard signs itself in with a hidden local account, so there is nothing to set up and nothing to forget. Open it from the tray icon → **Open Dashboard**, or in any browser on the same computer (for example http://127.0.0.1:31415); both sign in on their own. Another device reaching the app over LAN access still sees the sign-in form. Server installs (Docker, one-liner, `npm run dev`) do have an email + password account.
+**需要密码吗？** 桌面版不需要——仪表盘用一个隐藏的本地账号自动登录，没有需要设置、也没有可能忘记的东西。从托盘图标选择 **打开仪表盘**，或在同一台电脑的任意浏览器里访问（例如 http://127.0.0.1:31415），两者都会自动登录。通过局域网从其他设备访问时，仍然会看到登录表单。服务器安装（Docker、一键脚本、`npm run dev`）则需要邮箱 + 密码账号。
 
-**I forgot the password on a server install.** Click **Forgot password?** on the login page. There is no email to send a link to, so the one-time code is printed to the server log — read it with `docker compose logs -f freellmapi` (or in the terminal running the server, or in the desktop log file), then enter it on the reset form. The code lasts 15 minutes.
+**服务器安装忘了密码怎么办？** 在登录页点 **忘记密码？**。这里没有邮件可发，一次性验证码会打印到服务端日志——用 `docker compose logs -f freellmapi` 读取（源码运行看终端，桌面版看日志文件），再填进重置表单。验证码有效期为 15 分钟。
 
-**Where are the logs?** In the container log for Docker, in the terminal for a source run, and in `<data dir>/logs/freeapi.log` for the desktop app — reachable from the tray menu's **Open Logs Folder**.
+**日志在哪里？** Docker 看容器日志；源码运行看终端；桌面版在 `<数据目录>/logs/freeapi.log`，可从托盘菜单的 **打开日志文件夹** 进入。
 
-**How do I uninstall?** Remove the app (Trash on macOS, *Settings → Apps* on Windows, `docker compose down -v` for Docker), then delete the data directory: `%APPDATA%\FreeLLMAPI\`, `~/Library/Application Support/FreeLLMAPI/`, or `~/.config/FreeLLMAPI/`. Uninstalling never touches that folder on its own.
+**如何卸载？** 删除应用（macOS 拖进废纸篓，Windows 在 *设置 → 应用* 中卸载，Docker 执行 `docker compose down -v`），然后删除数据目录：`%APPDATA%\FreeLLMAPI\`、`~/Library/Application Support/FreeLLMAPI/` 或 `~/.config/FreeLLMAPI/`。卸载本身不会自动删除该目录。
 
-Longer answers, per install method: **[docs/en/install/01-install.md#faq-passwords-logs-uninstall](docs/en/install/01-install.md#faq-passwords-logs-uninstall)**.
+按安装方式的更详细答案见 **[docs/zh-cn/install/01-install.md](docs/zh-cn/install/01-install.md)**。
 
-## Limitations
+## 局限性
 
-Stacking free tiers has real trade-offs: no frontier models, variable latency, no SLA — and the effective intelligence of the endpoint dips late in the day as top models hit their daily caps, then resets at UTC midnight. Read the honest list in **[docs/en/architecture/00-high-level-index.md#limitations](docs/en/architecture/00-high-level-index.md#limitations)** before building anything real on this.
+叠加免费额度是有实实在在的代价的：没有前沿模型，延迟不稳定，没有 SLA。而且到了一天的后半段，顶级模型陆续触及当日上限，这个端点的实际智能水平会下滑，然后在 UTC 午夜重置。在拿它做任何正经东西之前，请先读一遍 **[docs/zh-cn/architecture/00-high-level-index.md#局限性](docs/zh-cn/architecture/00-high-level-index.md#局限性)** 里那份诚实的清单。
 
-## Contributing
+## 参与贡献
 
-Contributors very welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for the dev loop, PR expectations, and the policy on AI/LLM-assisted contributions (short version: welcome, same quality bar as any other PR). Good first PRs:
+非常欢迎贡献者！开发流程、PR 要求，以及关于 AI/LLM 辅助贡献的政策（简版：欢迎，质量标准和其他 PR 一样），都在 [CONTRIBUTING.md](CONTRIBUTING.md)。适合上手的第一个 PR：
 
-- **Add a provider** — copy `server/src/providers/openai-compat.ts` as a template, wire it into `server/src/providers/index.ts`, seed its models in `server/src/db/index.ts`, add a test in `server/src/__tests__/providers/`.
-- **Add an endpoint** — other OpenAI-compatible surfaces (e.g. `/v1/realtime`). The provider base class can grow new methods; adapters declare which they support.
-- **Improve the router** — cost-aware routing (cheapest-healthy-fastest tradeoffs), better latency-weighted priority, regional pinning.
-- **Dashboard polish** — charts on the Analytics page, key rotation UX, batch import of keys from `.env`.
-- **Docs** — more examples, client library snippets for Go/Rust/etc., a deployment recipe for Docker or Fly.
+- **加一家提供方** —— 复制 `server/src/providers/openai-compat.ts` 作为模板，在 `server/src/providers/index.ts` 里接上，在 `server/src/db/index.ts` 里种下它的模型，并在 `server/src/__tests__/providers/` 加一个测试。
+- **加一个接口** —— 其他 OpenAI 兼容接口（例如 `/v1/realtime`）。提供方基类可以扩展新方法，各适配器声明自己支持哪些。
+- **改进路由** —— 成本感知路由（在最便宜、最健康、最快之间取舍）、更好的延迟加权优先级、区域固定。
+- **打磨仪表盘** —— 分析页的图表、密钥轮换的交互、从 `.env` 批量导入密钥。
+- **文档** —— 更多示例、Go/Rust 等语言的客户端片段、Docker 或 Fly 的部署配方。
 
-`npm install && npm run dev` gets you the server on :3001 and the dashboard on :5173, both with HMR. For a repeatable setup, use `./scripts/dev-bootstrap.sh` on Bash or `.\scripts\dev-bootstrap.ps1` on PowerShell; each preserves an existing `.env`. PRs should include a test, keep the existing suite green (`npm test`), and match the `.editorconfig` / tsconfig defaults already in the repo. Database migration workflow and the full contributor loop are in [CONTRIBUTING.md](./CONTRIBUTING.md).
+`npm install && npm run dev` 就能起来：服务在 :3001，仪表盘在 :5173，两边都有热更新。想要可重复的初始化，Bash 用 `./scripts/dev-bootstrap.sh`，PowerShell 用 `.\scripts\dev-bootstrap.ps1`，两者都会保留已有的 `.env`。PR 应当包含测试、保持现有测试套件通过（`npm test`），并遵循仓库里已有的 `.editorconfig` 和 tsconfig 默认配置。数据库迁移流程和完整的贡献者循环见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-### Contributors
+### 贡献者
 
 <a href="https://github.com/moaaz12-web"><img src="https://images.weserv.nl/?url=github.com/moaaz12-web.png&w=40&h=40&fit=cover&mask=circle" width="40" alt="@moaaz12-web" /></a>
 <a href="https://github.com/lukasulc"><img src="https://images.weserv.nl/?url=github.com/lukasulc.png&w=40&h=40&fit=cover&mask=circle" width="40" alt="@lukasulc" /></a>
@@ -543,12 +535,16 @@ Contributors very welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for the dev lo
 <a href="https://github.com/ignamiranda"><img src="https://images.weserv.nl/?url=github.com/ignamiranda.png&w=40&h=40&fit=cover&mask=circle" width="40" alt="@ignamiranda" /></a>
 <a href="https://github.com/MoriDanWork"><img src="https://images.weserv.nl/?url=github.com/MoriDanWork.png&w=40&h=40&fit=cover&mask=circle" width="40" alt="@MoriDanWork" /></a>
 
-## Disclaimer
+## 免责声明
 
-**This project is for personal experimentation and learning, not production.** Free tiers exist so developers can prototype against them; they aren't a stable, supported inference substrate and shouldn't be treated as one. If you build something real on top of FreeLLMAPI, swap in a paid API before you ship. Your relationship with each upstream provider is governed by the terms you accepted when you created your account — those terms still apply when the traffic is proxied through this project, and you're responsible for complying with them.
+**本项目用于个人实验和学习，不适用于生产环境。** 免费额度的存在是为了让开发者拿来做原型；它们不是稳定、有支持的推理基础设施，也不该被当成这种东西。如果你要在 FreeLLMAPI 之上做真正的产品，上线前请换成付费 API。你和每家上游提供方之间的关系，受你注册账号时接受的条款约束；流量经由本项目代理时这些条款依然适用，遵守它们是你的责任。
 
-How each provider's ToS views a personal, single-user proxy — reviewed provider by provider in May 2026 — is in [docs/en/architecture/00-high-level-index.md#terms-of-service-review](docs/en/architecture/00-high-level-index.md#terms-of-service-review).
+各家提供方的服务条款如何看待一个个人的、单用户的代理，在 2026 年 5 月逐家审查过，结论在 [docs/zh-cn/architecture/00-high-level-index.md#服务条款审查](docs/zh-cn/architecture/00-high-level-index.md#服务条款审查)。
 
-## License
+## 许可证
 
-[MIT](./LICENSE)
+[MIT](LICENSE)
+
+---
+
+<sub>本页最初的中文翻译由 [@Robs87](https://github.com/Robs87) 在 [#244](https://github.com/tashfeenahmed/freellmapi/pull/244) 中贡献，本版本已针对当前 README 重新翻译。</sub>

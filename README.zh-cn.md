@@ -15,9 +15,9 @@
 
 **[freellmapi.co](https://freellmapi.co/?utm_source=github&utm_medium=readme&utm_campaign=repository&utm_content=readme_top)** · 浏览完整目录：474 个模型系列，635 个免费端点
 
-[English](README.md) · **简体中文**
+**简体中文**
 
-本翻译可能滞后，最新内容以英文 README 为准。
+> 本文件是历史副本，内容已合并进 [README.md](README.md)；后续请以 README.md 为准。
 
 ![FreeLLMAPI 仪表盘 —— 带每月词元额度的模型页](repo-assets/github-hero.png)
 
